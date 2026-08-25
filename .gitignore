@@ -15,4 +15,4 @@
 .cxx
 local.properties
 .env
-debug.keystore
+# debug.keystore intentionally NOT ignored — needed for CI builds (see BUILD_APK.md)
