@@ -22,15 +22,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Vibration
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -115,7 +117,7 @@ fun SecretSettingsDialog(
     }
 
     var selectedAccentName by remember(secretConfig) {
-        mutableStateOf(secretConfig?.accentColorTheme ?: AccentTheme.CYAN.name)
+        mutableStateOf(secretConfig?.accentColorTheme ?: AccentTheme.WHITE.name)
     }
 
     var pinCode by remember(secretConfig) {
@@ -124,6 +126,10 @@ fun SecretSettingsDialog(
 
     var isPinProtected by remember(secretConfig) {
         mutableStateOf(secretConfig?.isPinRequired ?: false)
+    }
+
+    var alarmForceTriggerType by remember(secretConfig) {
+        mutableStateOf(secretConfig?.alarmForceTriggerType ?: "ALWAYS")
     }
 
     val hoursList = remember { (1..12).map { it.toString() } }
@@ -149,29 +155,29 @@ fun SecretSettingsDialog(
                 Box(
                     modifier = Modifier
                         .size(38.dp)
-                        .background(SecretAura.copy(alpha = 0.2f), CircleShape),
+                        .background(Color.White.copy(alpha = 0.12f), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.AutoFixHigh,
-                        contentDescription = "Secret",
-                        tint = SecretAura,
+                        imageVector = Icons.Outlined.Settings,
+                        contentDescription = "Settings",
+                        tint = TextPrimary,
                         modifier = Modifier.size(22.dp)
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
-                        text = "Secret Settings",
+                        text = "Settings",
                         color = TextPrimary,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Mentalism & Prediction Engine",
-                        color = SecretAura,
+                        text = "Preferences & Options",
+                        color = TextSecondary,
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Normal
                     )
                 }
             }
@@ -218,7 +224,7 @@ fun SecretSettingsDialog(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            AccentTheme.values().forEach { themeOption ->
+                            AccentTheme.entries.forEach { themeOption ->
                                 val isSelected = selectedAccentName == themeOption.name
                                 Box(
                                     modifier = Modifier
@@ -377,6 +383,86 @@ fun SecretSettingsDialog(
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+                            HorizontalDivider(color = DividerColor.copy(alpha = 0.5f))
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            // ALARM SCROLL FORCE TRIGGERS (ALWAYS, PROXIMITY WAVE, VOLUME BUTTON)
+                            Text(
+                                text = "ALARM FORCE TRIGGER",
+                                color = TextTertiary,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.2.sp
+                            )
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            val triggerOptions = listOf(
+                                Triple("ALWAYS", "Always Active", "Continuous force on all scrolls"),
+                                Triple("PROXIMITY_WAVE", "Proximity Wave", "Wave hand over top sensor to arm"),
+                                Triple("VOLUME_BUTTON", "Volume Button", "Click Vol Up/Down to silently arm")
+                            )
+
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                triggerOptions.forEach { (typeKey, title, desc) ->
+                                    val isSelected = alarmForceTriggerType == typeKey
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(if (isSelected) SecretAura.copy(alpha = 0.22f) else DarkSurfaceVariant)
+                                            .border(
+                                                width = if (isSelected) 1.5.dp else 1.dp,
+                                                color = if (isSelected) SecretAura else Color(0x1AFFFFFF),
+                                                shape = RoundedCornerShape(12.dp)
+                                            )
+                                            .clickable { alarmForceTriggerType = typeKey }
+                                            .padding(horizontal = 14.dp, vertical = 10.dp)
+                                            .testTag("alarm_trigger_${typeKey.lowercase()}"),
+                                        contentAlignment = Alignment.CenterStart
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Column(modifier = Modifier.weight(1f)) {
+                                                Text(
+                                                    text = title,
+                                                    color = if (isSelected) SecretAura else TextPrimary,
+                                                    fontSize = 13.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                                Text(
+                                                    text = desc,
+                                                    color = if (isSelected) TextPrimary.copy(alpha = 0.9f) else TextSecondary,
+                                                    fontSize = 11.sp
+                                                )
+                                            }
+                                            if (isSelected) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(22.dp)
+                                                        .background(SecretAura, CircleShape),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Check,
+                                                        contentDescription = "Selected",
+                                                        tint = Color.Black,
+                                                        modifier = Modifier.size(14.dp)
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -458,7 +544,7 @@ fun SecretSettingsDialog(
                                 ) {
                                     Text(
                                         text = ".",
-                                        color = AmberAccent,
+                                        color = TextPrimary,
                                         fontSize = 32.sp,
                                         fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(end = 4.dp)
@@ -485,7 +571,7 @@ fun SecretSettingsDialog(
 
                                 Text(
                                     text = "Stopwatch Prediction: .${String.format(Locale.US, "%02d", forcedStopwatchCentiseconds)}s",
-                                    color = AmberAccent,
+                                    color = TextPrimary,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -502,10 +588,10 @@ fun SecretSettingsDialog(
                                         Box(
                                             modifier = Modifier
                                                 .clip(RoundedCornerShape(8.dp))
-                                                .background(if (isSelected) AmberAccent.copy(alpha = 0.25f) else DarkSurfaceVariant)
+                                                .background(if (isSelected) Color.White.copy(alpha = 0.25f) else DarkSurfaceVariant)
                                                 .border(
                                                     width = 1.dp,
-                                                    color = if (isSelected) AmberAccent else Color.Transparent,
+                                                    color = if (isSelected) Color.White else Color.Transparent,
                                                     shape = RoundedCornerShape(8.dp)
                                                 )
                                                 .clickable { forcedStopwatchCentiseconds = preset }
@@ -514,7 +600,7 @@ fun SecretSettingsDialog(
                                         ) {
                                             Text(
                                                 text = ".${String.format(Locale.US, "%02d", preset)}",
-                                                color = if (isSelected) AmberAccent else TextSecondary,
+                                                color = if (isSelected) Color.White else TextSecondary,
                                                 fontSize = 11.sp,
                                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                                             )
@@ -556,10 +642,10 @@ fun SecretSettingsDialog(
                                             modifier = Modifier
                                                 .weight(1f)
                                                 .clip(RoundedCornerShape(10.dp))
-                                                .background(if (isSelected) AmberAccent.copy(alpha = 0.3f) else DarkSurfaceVariant)
+                                                .background(if (isSelected) Color.White.copy(alpha = 0.25f) else DarkSurfaceVariant)
                                                 .border(
                                                     width = if (isSelected) 1.5.dp else 0.dp,
-                                                    color = if (isSelected) AmberAccent else Color.Transparent,
+                                                    color = if (isSelected) Color.White else Color.Transparent,
                                                     shape = RoundedCornerShape(10.dp)
                                                 )
                                                 .clickable { stopwatchForceTriggerStopCount = count }
@@ -568,7 +654,7 @@ fun SecretSettingsDialog(
                                         ) {
                                             Text(
                                                 text = label,
-                                                color = if (isSelected) AmberAccent else TextPrimary,
+                                                color = if (isSelected) Color.White else TextPrimary,
                                                 fontSize = 12.sp,
                                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                                             )
@@ -588,10 +674,10 @@ fun SecretSettingsDialog(
                                             modifier = Modifier
                                                 .weight(1f)
                                                 .clip(RoundedCornerShape(10.dp))
-                                                .background(if (isSelected) AmberAccent.copy(alpha = 0.3f) else DarkSurfaceVariant)
+                                                .background(if (isSelected) Color.White.copy(alpha = 0.25f) else DarkSurfaceVariant)
                                                 .border(
                                                     width = if (isSelected) 1.5.dp else 0.dp,
-                                                    color = if (isSelected) AmberAccent else Color.Transparent,
+                                                    color = if (isSelected) Color.White else Color.Transparent,
                                                     shape = RoundedCornerShape(10.dp)
                                                 )
                                                 .clickable { stopwatchForceTriggerStopCount = count }
@@ -600,7 +686,7 @@ fun SecretSettingsDialog(
                                         ) {
                                             Text(
                                                 text = label,
-                                                color = if (isSelected) AmberAccent else TextPrimary,
+                                                color = if (isSelected) Color.White else TextPrimary,
                                                 fontSize = 12.sp,
                                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                                             )
@@ -611,17 +697,17 @@ fun SecretSettingsDialog(
                                 Spacer(modifier = Modifier.height(8.dp))
 
                                 val triggerExplanation = when (stopwatchForceTriggerStopCount) {
-                                    1 -> "✨ Forces on the 1st stop (Immediate standard force)."
-                                    2 -> "✨ Forces on the 2nd stop. The 1st stop runs 100% naturally so the spectator can test the stopwatch first!"
-                                    3 -> "✨ Forces on the 3rd stop. Stops #1 and #2 run naturally without forcing."
-                                    4 -> "✨ Forces on the 4th stop. Stops #1 through #3 run naturally."
-                                    5 -> "✨ Forces on the 5th stop. Stops #1 through #4 run naturally."
-                                    else -> "✨ Forces on every single pause/stop."
+                                    1 -> "Forces on the 1st stop (Immediate standard force)."
+                                    2 -> "Forces on the 2nd stop. The 1st stop runs 100% naturally so the spectator can test the stopwatch first!"
+                                    3 -> "Forces on the 3rd stop. Stops #1 and #2 run naturally without forcing."
+                                    4 -> "Forces on the 4th stop. Stops #1 through #3 run naturally."
+                                    5 -> "Forces on the 5th stop. Stops #1 through #4 run naturally."
+                                    else -> "Forces on every single pause/stop."
                                 }
 
                                 Text(
                                     text = triggerExplanation,
-                                    color = AmberAccent.copy(alpha = 0.9f),
+                                    color = TextSecondary,
                                     fontSize = 11.sp,
                                     lineHeight = 16.sp
                                 )
@@ -661,7 +747,7 @@ fun SecretSettingsDialog(
                                 onCheckedChange = { isPinProtected = it },
                                 colors = SwitchDefaults.colors(
                                     checkedThumbColor = Color.Black,
-                                    checkedTrackColor = AmberAccent
+                                    checkedTrackColor = Color.White
                                 ),
                                 modifier = Modifier.testTag("pin_protection_switch")
                             )
@@ -725,6 +811,7 @@ fun SecretSettingsDialog(
                             forcedHour = forcedHour,
                             forcedMinute = forcedMinute,
                             forcedIsPm = forcedIsPm,
+                            alarmForceTriggerType = alarmForceTriggerType,
                             isStopwatchForceEnabled = isStopwatchForceEnabled,
                             forcedStopwatchCentiseconds = forcedStopwatchCentiseconds,
                             stopwatchForceTriggerStopCount = stopwatchForceTriggerStopCount,
@@ -770,9 +857,9 @@ fun SecretPinPromptDialog(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Default.Security,
-                    contentDescription = "PIN Lock",
-                    tint = AmberAccent
+                    imageVector = Icons.Outlined.Lock,
+                    contentDescription = "Passcode Lock",
+                    tint = TextPrimary
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
@@ -786,7 +873,7 @@ fun SecretPinPromptDialog(
         text = {
             Column {
                 Text(
-                    text = "Please enter the secret code to proceed.",
+                    text = "Please enter the passcode to access Settings.",
                     color = TextSecondary,
                     fontSize = 13.sp
                 )

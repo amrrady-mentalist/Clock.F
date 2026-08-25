@@ -62,6 +62,10 @@ import com.example.ui.theme.TextTertiary
 import com.example.ui.viewmodel.ClockViewModel
 import java.util.Locale
 
+import com.example.ui.theme.glassBorderBrush
+import com.example.ui.theme.liquidGlass
+import com.example.ui.theme.GlassSurfaceDark
+
 @Composable
 fun TimerScreen(
     viewModel: ClockViewModel,
@@ -147,9 +151,17 @@ fun TimerScreen(
             } else {
                 // Time Duration Wheel Selector
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = DarkSurface),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier.fillMaxWidth().testTag("timer_picker_card")
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .liquidGlass(
+                            shape = RoundedCornerShape(24.dp),
+                            backgroundColor = GlassSurfaceDark,
+                            borderWidth = 1.dp,
+                            borderBrush = glassBorderBrush(0.4f, 0.12f, 0.04f)
+                        )
+                        .testTag("timer_picker_card")
                 ) {
                     Column(
                         modifier = Modifier.padding(20.dp),
@@ -274,8 +286,8 @@ fun TimerScreen(
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isRunning) RedAccent else primaryColor,
-                            contentColor = if (isRunning) Color.White else Color.Black
+                            containerColor = primaryColor,
+                            contentColor = Color.Black
                         ),
                         shape = CircleShape,
                         modifier = Modifier.size(80.dp).testTag("timer_start_pause_button")
@@ -283,6 +295,7 @@ fun TimerScreen(
                         Icon(
                             imageVector = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
                             contentDescription = if (isRunning) "Pause" else "Start",
+                            tint = Color.Black,
                             modifier = Modifier.size(36.dp)
                         )
                     }
@@ -334,13 +347,13 @@ fun TimerScreen(
                     Box(
                         modifier = Modifier
                             .size(90.dp)
-                            .background(AmberAccent.copy(alpha = 0.2f), CircleShape),
+                            .background(Color.White.copy(alpha = 0.15f), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.NotificationsActive,
                             contentDescription = "Timer Finished",
-                            tint = AmberAccent,
+                            tint = Color.White,
                             modifier = Modifier.size(48.dp)
                         )
                     }

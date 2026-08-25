@@ -37,6 +37,7 @@ data class SecretConfigEntity(
     val forcedHour: Int = 7,
     val forcedMinute: Int = 30,
     val forcedIsPm: Boolean = false, // false = AM, true = PM
+    val alarmForceTriggerType: String = "ALWAYS", // ALWAYS, PROXIMITY_WAVE, VOLUME_BUTTON
     val isStopwatchForceEnabled: Boolean = false,
     val forcedStopwatchCentiseconds: Int = 37, // 0-99 hundredths of a second (.00 to .99)
     val stopwatchForceTriggerStopCount: Int = 1, // 0 = Every Stop, 1 = 1st Stop, 2 = 2nd Stop, 3 = 3rd Stop, etc.
@@ -46,5 +47,5 @@ data class SecretConfigEntity(
     val hapticFeedback: Boolean = true,
     val secretTriggerGesture: String = "LONG_PRESS_HEADER", // LONG_PRESS_HEADER, TRIPLE_TAP, DOUBLE_TAP_COLON
     val forceAlarmsCount: Int = 0, // Statistics on successful forces
-    val accentColorTheme: String = "CYAN"
+    val accentColorTheme: String = "WHITE"
 )

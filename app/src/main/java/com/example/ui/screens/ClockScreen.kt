@@ -24,11 +24,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Nightlight
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ViewAgenda
-import androidx.compose.material.icons.filled.WatchLater
-import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.LightMode
+import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Splitscreen
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -79,6 +79,10 @@ import java.util.Locale
 import java.util.TimeZone
 import kotlin.math.abs
 
+import com.example.ui.theme.glassBorderBrush
+import com.example.ui.theme.liquidGlass
+import com.example.ui.theme.GlassSurfaceDark
+
 @Composable
 fun ClockScreen(
     viewModel: ClockViewModel,
@@ -125,10 +129,16 @@ fun ClockScreen(
 
                 // Hero Clock Display (Switchable between Analog and Digital)
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = DarkSurface),
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(28.dp),
                     modifier = Modifier
                         .fillMaxWidth()
+                        .liquidGlass(
+                            shape = RoundedCornerShape(28.dp),
+                            backgroundColor = GlassSurfaceDark,
+                            borderWidth = 1.dp,
+                            borderBrush = glassBorderBrush(0.4f, 0.12f, 0.04f)
+                        )
                         .testTag("hero_clock_card")
                 ) {
                     Column(
@@ -184,7 +194,7 @@ fun ClockScreen(
                                 ) {
                                     Text(
                                         text = secFormat.format(Date(currentTimeMs)),
-                                        color = AmberAccent,
+                                        color = TextPrimary,
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.Bold,
                                         fontFamily = FontFamily.Monospace
@@ -211,7 +221,7 @@ fun ClockScreen(
                                 modifier = Modifier.testTag("toggle_clock_style_button")
                             ) {
                                 Icon(
-                                    imageVector = if (showAnalogClock) Icons.Default.ViewAgenda else Icons.Default.WatchLater,
+                                    imageVector = if (showAnalogClock) Icons.Outlined.Splitscreen else Icons.Outlined.Schedule,
                                     contentDescription = "Switch Style",
                                     tint = TextSecondary,
                                     modifier = Modifier.size(16.dp)
@@ -325,10 +335,16 @@ fun WorldCityCard(
     val isDayTime = cityHour24 in 6..18
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = DarkSurface),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier
             .fillMaxWidth()
+            .liquidGlass(
+                shape = RoundedCornerShape(20.dp),
+                backgroundColor = GlassSurfaceDark,
+                borderWidth = 1.dp,
+                borderBrush = glassBorderBrush(0.3f, 0.1f, 0.03f)
+            )
             .testTag("world_city_card_${city.cityName}")
     ) {
         Row(
@@ -348,9 +364,9 @@ fun WorldCityCard(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
-                        imageVector = if (isDayTime) Icons.Default.WbSunny else Icons.Default.Nightlight,
+                        imageVector = if (isDayTime) Icons.Outlined.LightMode else Icons.Outlined.DarkMode,
                         contentDescription = if (isDayTime) "Day" else "Night",
-                        tint = if (isDayTime) AmberAccent else VioletAccent,
+                        tint = if (isDayTime) Color.White else Color(0xFFA1A1AA),
                         modifier = Modifier.size(16.dp)
                     )
                 }
@@ -462,7 +478,7 @@ fun AddCityDialog(
                     placeholder = { Text("Search city or country...", color = TextTertiary) },
                     leadingIcon = {
                         Icon(
-                            imageVector = Icons.Default.Search,
+                            imageVector = Icons.Outlined.Search,
                             contentDescription = "Search",
                             tint = primaryColor
                         )

@@ -51,26 +51,35 @@ fun AnalogClockView(
             val center = Offset(this.size.width / 2, this.size.height / 2)
             val radius = this.size.width / 2
 
-            // Dial Background
+            // Liquid Glass Dial Background
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        DarkSurfaceVariant.copy(alpha = 0.6f),
+                        Color(0x33FFFFFF),
+                        DarkSurfaceVariant.copy(alpha = 0.75f),
                         DarkSurface.copy(alpha = 0.95f)
                     ),
-                    center = center,
-                    radius = radius
+                    center = center - Offset(0f, radius * 0.3f),
+                    radius = radius * 1.3f
                 ),
                 radius = radius,
                 center = center
             )
 
-            // Outer subtle bezel
+            // Outer Liquid Glass Specular Bezel Rim
             drawCircle(
-                color = Color(0xFF243048),
-                radius = radius,
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color.White.copy(alpha = 0.45f),
+                        Color.White.copy(alpha = 0.12f),
+                        Color.White.copy(alpha = 0.04f)
+                    ),
+                    startY = center.y - radius,
+                    endY = center.y + radius
+                ),
+                radius = radius - 1.dp.toPx(),
                 center = center,
-                style = Stroke(width = 3.dp.toPx())
+                style = Stroke(width = 1.5.dp.toPx())
             )
 
             // Hour tick marks & markers
@@ -95,12 +104,12 @@ fun AnalogClockView(
                 )
             }
 
-            // 12, 3, 6, 9 numeral indicators
+            // 12, 3, 6, 9 numeral indicators in Roboto font
             val textPaint = android.graphics.Paint().apply {
                 color = android.graphics.Color.WHITE
-                textSize = 14.dp.toPx()
+                textSize = 13.5.dp.toPx()
                 textAlign = android.graphics.Paint.Align.CENTER
-                typeface = android.graphics.Typeface.DEFAULT_BOLD
+                typeface = android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL)
                 isAntiAlias = true
             }
 
@@ -137,21 +146,21 @@ fun AnalogClockView(
                 )
             }
 
-            // Second Hand
+            // Second Hand (Clean minimal white)
             if (showSeconds) {
                 val secondAngle = second * 6f
                 rotate(degrees = secondAngle, pivot = center) {
                     drawLine(
-                        color = RedAccent,
+                        color = Color.White,
                         start = center - Offset(0f, -22.dp.toPx()),
                         end = center - Offset(0f, radius * 0.85f),
-                        strokeWidth = 2.dp.toPx(),
+                        strokeWidth = 1.8.dp.toPx(),
                         cap = StrokeCap.Round
                     )
                     // Small counter-balance tail circle
                     drawCircle(
-                        color = RedAccent,
-                        radius = 4.dp.toPx(),
+                        color = Color.White,
+                        radius = 3.5.dp.toPx(),
                         center = center - Offset(0f, -20.dp.toPx())
                     )
                 }
@@ -159,13 +168,13 @@ fun AnalogClockView(
 
             // Center Pin / Hub
             drawCircle(
-                color = RedAccent,
-                radius = 5.dp.toPx(),
+                color = Color.White,
+                radius = 4.5.dp.toPx(),
                 center = center
             )
             drawCircle(
-                color = DarkSurface,
-                radius = 2.5.dp.toPx(),
+                color = Color.Black,
+                radius = 2.dp.toPx(),
                 center = center
             )
         }

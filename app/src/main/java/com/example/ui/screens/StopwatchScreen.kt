@@ -57,6 +57,10 @@ import com.example.ui.theme.TextTertiary
 import com.example.ui.viewmodel.ClockViewModel
 import java.util.Locale
 
+import com.example.ui.theme.glassBorderBrush
+import com.example.ui.theme.liquidGlass
+import com.example.ui.theme.GlassSurfaceDark
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StopwatchScreen(
@@ -120,7 +124,7 @@ fun StopwatchScreen(
                     )
                     Text(
                         text = String.format(Locale.US, ".%02d", millis),
-                        color = AmberAccent,
+                        color = TextSecondary,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = FontFamily.Monospace,
@@ -185,8 +189,8 @@ fun StopwatchScreen(
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isRunning) RedAccent else primaryColor,
-                    contentColor = if (isRunning) Color.White else Color.Black
+                    containerColor = primaryColor,
+                    contentColor = Color.Black
                 ),
                 shape = CircleShape,
                 modifier = Modifier.size(80.dp).testTag("start_pause_stopwatch_button")
@@ -194,6 +198,7 @@ fun StopwatchScreen(
                 Icon(
                     imageVector = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
                     contentDescription = if (isRunning) "Pause" else "Start",
+                    tint = Color.Black,
                     modifier = Modifier.size(36.dp)
                 )
             }
@@ -204,11 +209,17 @@ fun StopwatchScreen(
         // Laps List
         if (laps.isNotEmpty()) {
             Card(
-                colors = CardDefaults.cardColors(containerColor = DarkSurface),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
+                    .liquidGlass(
+                        shape = RoundedCornerShape(20.dp),
+                        backgroundColor = GlassSurfaceDark,
+                        borderWidth = 1.dp,
+                        borderBrush = glassBorderBrush(0.35f, 0.1f, 0.03f)
+                    )
                     .testTag("laps_card")
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {

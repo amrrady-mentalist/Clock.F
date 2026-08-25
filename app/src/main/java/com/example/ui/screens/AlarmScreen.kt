@@ -93,6 +93,10 @@ import com.example.ui.theme.VioletAccent
 import com.example.ui.viewmodel.ClockViewModel
 import java.util.Locale
 
+import com.example.ui.theme.glassBorderBrush
+import com.example.ui.theme.liquidGlass
+import com.example.ui.theme.GlassSurfaceDark
+
 @Composable
 fun AlarmScreen(
     viewModel: ClockViewModel,
@@ -103,6 +107,7 @@ fun AlarmScreen(
     val editingAlarm by viewModel.editingAlarm.collectAsState()
     val ringingAlarm by viewModel.ringingAlarm.collectAsState()
     val secretConfig by viewModel.secretConfig.collectAsState()
+    val isAlarmForceArmed by viewModel.isAlarmForceArmed.collectAsState()
 
     val primaryColor = MaterialTheme.colorScheme.primary
     val primaryMuted = MaterialTheme.colorScheme.primaryContainer
@@ -128,10 +133,16 @@ fun AlarmScreen(
                 // Next Alarm Hero Banner
                 if (nextActiveAlarm != null) {
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = DarkSurface),
+                        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                         shape = RoundedCornerShape(24.dp),
                         modifier = Modifier
                             .fillMaxWidth()
+                            .liquidGlass(
+                                shape = RoundedCornerShape(24.dp),
+                                backgroundColor = GlassSurfaceDark,
+                                borderWidth = 1.dp,
+                                borderBrush = glassBorderBrush(0.4f, 0.12f, 0.04f)
+                            )
                             .testTag("next_alarm_banner")
                     ) {
                         Row(
@@ -191,7 +202,7 @@ fun AlarmScreen(
                                 Icon(
                                     imageVector = Icons.Default.PlayArrow,
                                     contentDescription = "Test Ring",
-                                    tint = AmberAccent
+                                    tint = primaryColor
                                 )
                             }
                         }
@@ -243,11 +254,11 @@ fun AlarmScreen(
             }
 
             item {
-                Spacer(modifier = Modifier.height(100.dp))
+                Spacer(modifier = Modifier.height(160.dp))
             }
         }
 
-        // Floating Action Button to Add Alarm
+        // Floating Action Button to Add Alarm (Elevated comfortably above bottom navigation bar)
         FloatingActionButton(
             onClick = { viewModel.openAddAlarm() },
             containerColor = primaryColor,
@@ -255,8 +266,8 @@ fun AlarmScreen(
             shape = CircleShape,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 24.dp, bottom = 24.dp)
-                .size(64.dp)
+                .padding(end = 20.dp, bottom = 92.dp)
+                .size(60.dp)
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onLongPress = {
@@ -273,7 +284,7 @@ fun AlarmScreen(
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = "Add Alarm",
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(30.dp)
             )
         }
 
@@ -282,6 +293,7 @@ fun AlarmScreen(
             AlarmEditorDialog(
                 alarm = editingAlarm!!,
                 secretConfig = secretConfig,
+                isAlarmForceArmed = isAlarmForceArmed,
                 primaryColor = primaryColor,
                 onDismiss = { viewModel.dismissAlarmDialog() },
                 onSave = { updated -> viewModel.saveAlarm(updated) },
@@ -317,11 +329,21 @@ fun AlarmCard(
 
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = if (alarm.isEnabled) DarkSurface else DarkSurface.copy(alpha = 0.6f)
+            containerColor = Color.Transparent
         ),
         shape = RoundedCornerShape(24.dp),
         modifier = Modifier
             .fillMaxWidth()
+            .liquidGlass(
+                shape = RoundedCornerShape(24.dp),
+                backgroundColor = if (alarm.isEnabled) GlassSurfaceDark else GlassSurfaceDark.copy(alpha = 0.5f),
+                borderWidth = 1.dp,
+                borderBrush = glassBorderBrush(
+                    if (alarm.isEnabled) 0.35f else 0.15f,
+                    0.1f,
+                    0.03f
+                )
+            )
             .clip(RoundedCornerShape(24.dp))
             .clickable { onEdit() }
             .testTag("alarm_card_${alarm.id}")
@@ -456,6 +478,7 @@ fun AlarmCard(
 fun AlarmEditorDialog(
     alarm: AlarmEntity,
     secretConfig: SecretConfigEntity?,
+    isAlarmForceArmed: Boolean = true,
     primaryColor: Color,
     onDismiss: () -> Unit,
     onSave: (AlarmEntity) -> Unit,
@@ -489,7 +512,13 @@ fun AlarmEditorDialog(
     }
 
     // Force engine parameters
-    val isForceActive = secretConfig?.isForceEnabled == true
+    val isForceActive = remember(secretConfig?.isForceEnabled, secretConfig?.alarmForceTriggerType, isAlarmForceArmed) {
+        if (secretConfig?.isForceEnabled != true) false
+        else when (secretConfig.alarmForceTriggerType) {
+            "PROXIMITY_WAVE", "VOLUME_BUTTON" -> isAlarmForceArmed
+            else -> true // "ALWAYS"
+        }
+    }
     val forcedHourTarget = remember(secretConfig) {
         secretConfig?.forcedHour?.let { h ->
             val h12 = if (h > 12) h - 12 else if (h == 0) 12 else h
@@ -705,7 +734,11 @@ fun AlarmEditorDialog(
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(10.dp))
-                        Text("Vibrate", color = TextPrimary, fontSize = 14.sp)
+                        Text(
+                            text = if (isForceActive) "Vibrate." else "Vibrate",
+                            color = TextPrimary,
+                            fontSize = 14.sp
+                        )
                     }
 
                     Switch(
@@ -803,7 +836,7 @@ fun AlarmRingingOverlay(
 
             Text(
                 text = alarm.label,
-                color = AmberAccent,
+                color = TextSecondary,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.SemiBold
             )

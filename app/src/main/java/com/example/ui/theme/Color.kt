@@ -2,26 +2,37 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Midnight Clock Palette
-val DarkBg = Color(0xFF090D16)
-val DarkSurface = Color(0xFF131A29)
-val DarkSurfaceVariant = Color(0xFF1C263B)
-val DarkSurfaceHover = Color(0xFF26334D)
+// Minimal Monochromatic Pitch Black Canvas
+val DarkBg = Color(0xFF000000)
+val DarkBgGradientTop = Color(0xFF000000)
+val DarkBgGradientBottom = Color(0xFF000000)
 
-// Vibrant Accents
-val CyanAccent = Color(0xFF00E5FF)
-val CyanAccentMuted = Color(0x3300E5FF)
-val VioletAccent = Color(0xFF8B5CF6)
-val AmberAccent = Color(0xFFFFB020)
-val RedAccent = Color(0xFFFF4B55)
-val GreenAccent = Color(0xFF10B981)
+val DarkSurface = Color(0xFF0C0C0E)
+val DarkSurfaceGlass = Color(0x1AFFFFFF)
+val DarkSurfaceVariant = Color(0xFF18181B)
+val DarkSurfaceHover = Color(0xFF27272A)
 
-// Magic Stealth Theme Accents
-val SecretAura = Color(0xFFA855F7)
-val SecretGold = Color(0xFFFBBF24)
+// Minimalist White Main Accent
+val WhiteAccent = Color(0xFFFFFFFF)
+val WhiteAccentMuted = Color(0x2EFFFFFF)
 
-// Text & Icons
-val TextPrimary = Color(0xFFF8FAFC)
-val TextSecondary = Color(0xFF94A3B8)
-val TextTertiary = Color(0xFF64748B)
-val DividerColor = Color(0xFF1E293B)
+// Legacy accent color aliases aligned to clean monochromatic minimalism
+val CyanAccent = Color(0xFFFFFFFF)
+val CyanAccentMuted = Color(0x2EFFFFFF)
+val VioletAccent = Color(0xFFE4E4E7)
+val AmberAccent = Color(0xFFFFFFFF)
+val RedAccent = Color(0xFFFFFFFF)
+val GreenAccent = Color(0xFFFFFFFF)
+val BlueAccent = Color(0xFFFFFFFF)
+
+// Stealth Theme Accents (Pure white & silver)
+val SecretAura = Color(0xFFFFFFFF)
+val SecretGold = Color(0xFFE4E4E7)
+
+// Text & Icons (Crisp high-contrast flat white minimalism)
+val TextPrimary = Color(0xFFFFFFFF)
+val TextSecondary = Color(0xFFA1A1AA)
+val TextTertiary = Color(0xFF52525B)
+val DividerColor = Color(0x1FFFFFFF)
+
+

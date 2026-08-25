@@ -109,6 +109,10 @@ class ClockViewModel(application: Application) : AndroidViewModel(application) {
     private val _discreetNotice = MutableStateFlow<String?>(null)
     val discreetNotice = _discreetNotice.asStateFlow()
 
+    // Alarm force dynamic arm state (for PROXIMITY_WAVE and VOLUME_BUTTON triggers)
+    private val _isAlarmForceArmed = MutableStateFlow(false)
+    val isAlarmForceArmed = _isAlarmForceArmed.asStateFlow()
+
     init {
         val database = AppDatabase.getDatabase(application, viewModelScope)
         repository = ClockRepository(database.clockDao())
@@ -401,6 +405,57 @@ class ClockViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.saveSecretConfig(updated)
         }
+    }
+
+    fun isAlarmForceEffectivelyActive(): Boolean {
+        val config = secretConfig.value ?: return false
+        if (!config.isForceEnabled) return false
+        return when (config.alarmForceTriggerType) {
+            "PROXIMITY_WAVE", "VOLUME_BUTTON" -> _isAlarmForceArmed.value
+            else -> true // "ALWAYS"
+        }
+    }
+
+    /**
+     * Triggered when a hand wave over the proximity sensor is detected.
+     */
+    fun onProximityWaveDetected() {
+        val config = secretConfig.value ?: return
+        if (!config.isForceEnabled) return
+        if (config.alarmForceTriggerType == "PROXIMITY_WAVE") {
+            val newState = !_isAlarmForceArmed.value
+            _isAlarmForceArmed.value = newState
+            if (newState) {
+                // Subtle crisp double haptic pulse indicating force armed
+                performHaptic(pattern = longArrayOf(0, 45, 60, 45))
+            } else {
+                // Single short haptic pulse indicating force disarmed
+                performHaptic(pattern = longArrayOf(0, 80))
+            }
+        }
+    }
+
+    /**
+     * Triggered when a volume button is clicked without changing volume.
+     */
+    fun onVolumeButtonTriggered() {
+        val config = secretConfig.value ?: return
+        if (!config.isForceEnabled) return
+        if (config.alarmForceTriggerType == "VOLUME_BUTTON") {
+            val newState = !_isAlarmForceArmed.value
+            _isAlarmForceArmed.value = newState
+            if (newState) {
+                // Subtle crisp double haptic pulse indicating force armed
+                performHaptic(pattern = longArrayOf(0, 45, 60, 45))
+            } else {
+                // Single short haptic pulse indicating force disarmed
+                performHaptic(pattern = longArrayOf(0, 80))
+            }
+        }
+    }
+
+    fun resetAlarmForceArmed() {
+        _isAlarmForceArmed.value = false
     }
 
     /**

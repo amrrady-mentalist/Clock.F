@@ -12,18 +12,18 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-val LocalAccentTheme = compositionLocalOf { AccentTheme.CYAN }
+val LocalAccentTheme = compositionLocalOf { AccentTheme.WHITE }
 
 fun createClockColorScheme(accent: AccentTheme) = darkColorScheme(
     primary = accent.primary,
     onPrimary = Color.Black,
     primaryContainer = accent.primaryMuted,
-    onPrimaryContainer = accent.primary,
-    secondary = VioletAccent,
-    onSecondary = Color.White,
-    secondaryContainer = Color(0xFF2E1065),
-    onSecondaryContainer = Color(0xFFDDD6FE),
-    tertiary = AmberAccent,
+    onPrimaryContainer = Color.White,
+    secondary = Color(0xFFE4E4E7),
+    onSecondary = Color.Black,
+    secondaryContainer = Color(0xFF27272A),
+    onSecondaryContainer = Color.White,
+    tertiary = Color(0xFFD4D4D8),
     onTertiary = Color.Black,
     background = DarkBg,
     onBackground = TextPrimary,
@@ -32,13 +32,13 @@ fun createClockColorScheme(accent: AccentTheme) = darkColorScheme(
     surfaceVariant = DarkSurfaceVariant,
     onSurfaceVariant = TextSecondary,
     outline = TextTertiary,
-    error = RedAccent,
-    onError = Color.White
+    error = Color.White,
+    onError = Color.Black
 )
 
 @Composable
 fun ClockTheme(
-    accent: AccentTheme = AccentTheme.CYAN,
+    accent: AccentTheme = AccentTheme.WHITE,
     content: @Composable () -> Unit
 ) {
     val colorScheme = createClockColorScheme(accent)
