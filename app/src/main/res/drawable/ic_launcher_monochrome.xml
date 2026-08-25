@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Clock Outer Dial Rim -->
+    <path
+        android:pathData="M54,54m-27,0a27,27 0 1,1 54,0a27,27 0 1,1 -54,0"
+        android:strokeWidth="2.5"
+        android:strokeColor="#FFFFFF" />
+
+    <!-- 12 O'Clock Marker (Top) -->
+    <path
+        android:pathData="M54,30.5 L54,34.5"
+        android:strokeWidth="2.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round" />
+
+    <!-- 3 O'Clock Marker (Right) -->
+    <path
+        android:pathData="M77.5,54 L73.5,54"
+        android:strokeWidth="2.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round" />
+
+    <!-- 6 O'Clock Marker (Bottom) -->
+    <path
+        android:pathData="M54,77.5 L54,73.5"
+        android:strokeWidth="2.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round" />
+
+    <!-- 9 O'Clock Marker (Left) -->
+    <path
+        android:pathData="M30.5,54 L34.5,54"
+        android:strokeWidth="2.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round" />
+
+    <!-- Intermediate Hour Marker Dots -->
+    <path android:pathData="M64.5,35.8m-1,0a1,1 0 1,1 2,0a1,1 0 1,1 -2,0" android:fillColor="#FFFFFF" />
+    <path android:pathData="M72.2,43.5m-1,0a1,1 0 1,1 2,0a1,1 0 1,1 -2,0" android:fillColor="#FFFFFF" />
+    <path android:pathData="M72.2,64.5m-1,0a1,1 0 1,1 2,0a1,1 0 1,1 -2,0" android:fillColor="#FFFFFF" />
+    <path android:pathData="M64.5,72.2m-1,0a1,1 0 1,1 2,0a1,1 0 1,1 -2,0" android:fillColor="#FFFFFF" />
+    <path android:pathData="M43.5,72.2m-1,0a1,1 0 1,1 2,0a1,1 0 1,1 -2,0" android:fillColor="#FFFFFF" />
+    <path android:pathData="M35.8,64.5m-1,0a1,1 0 1,1 2,0a1,1 0 1,1 -2,0" android:fillColor="#FFFFFF" />
+    <path android:pathData="M35.8,43.5m-1,0a1,1 0 1,1 2,0a1,1 0 1,1 -2,0" android:fillColor="#FFFFFF" />
+    <path android:pathData="M43.5,35.8m-1,0a1,1 0 1,1 2,0a1,1 0 1,1 -2,0" android:fillColor="#FFFFFF" />
+
+    <!-- Hour Hand -->
+    <path
+        android:pathData="M54,54 L43,45"
+        android:strokeWidth="3.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round" />
+
+    <!-- Minute Hand -->
+    <path
+        android:pathData="M54,54 L69,43"
+        android:strokeWidth="2.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round" />
+
+    <!-- Second Hand -->
+    <path
+        android:pathData="M54,58 L54,34"
+        android:strokeWidth="1.2"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round" />
+
+    <!-- Center Pivot Ring & Cap -->
+    <path
+        android:pathData="M54,54m-3.5,0a3.5,3.5 0 1,1 7,0a3.5,3.5 0 1,1 -7,0"
+        android:fillColor="#FFFFFF" />
+
+</vector>

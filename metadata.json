@@ -1,0 +1,6 @@
+{
+  "name": "Clock",
+  "description": "Comprehensive Clock app featuring World Clock, Alarms, Stopwatch, Timer, and customizable secret wheel force controls.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
