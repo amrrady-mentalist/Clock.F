@@ -7,9 +7,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="splash_background">#FF0B0F19</color>
-    <color name="icon_bg_start">#FF0B1120</color>
-    <color name="icon_bg_end">#FF162238</color>
-    <color name="icon_cyan">#FF06B6D4</color>
-    <color name="icon_blue">#FF38BDF8</color>
+    <color name="splash_background">#FF1D1D20</color>
+    <color name="icon_bg_start">#FF262629</color>
+    <color name="icon_bg_end">#FF141416</color>
+    <color name="icon_blue_accent">#FF2563EB</color>
 </resources>
