@@ -165,8 +165,8 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         if (event.keyCode == KeyEvent.KEYCODE_VOLUME_UP || event.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
             val secretConfig = viewModel.secretConfig.value
             // If the volume button trigger is selected in secret settings, intercept it secretly
-            if (secretConfig?.isForceEnabled == true && secretConfig.alarmForceTriggerType == "VOLUME_BUTTON") {
-                if (event.action == KeyEvent.ACTION_DOWN) {
+            if (secretConfig?.alarmForceTriggerType == "VOLUME_BUTTON") {
+                if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
                     viewModel.onVolumeButtonTriggered()
                 }
                 // Return true to prevent system volume HUD from popping up or altering volume
@@ -174,6 +174,29 @@ class MainActivity : ComponentActivity(), SensorEventListener {
             }
         }
         return super.dispatchKeyEvent(event)
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            val secretConfig = viewModel.secretConfig.value
+            if (secretConfig?.alarmForceTriggerType == "VOLUME_BUTTON") {
+                if (event?.repeatCount == 0) {
+                    viewModel.onVolumeButtonTriggered()
+                }
+                return true
+            }
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            val secretConfig = viewModel.secretConfig.value
+            if (secretConfig?.alarmForceTriggerType == "VOLUME_BUTTON") {
+                return true
+            }
+        }
+        return super.onKeyUp(keyCode, event)
     }
 }
 

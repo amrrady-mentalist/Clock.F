@@ -420,11 +420,15 @@ class ClockViewModel(application: Application) : AndroidViewModel(application) {
      * Triggered when a hand wave over the proximity sensor is detected.
      */
     fun onProximityWaveDetected() {
-        val config = secretConfig.value ?: return
-        if (!config.isForceEnabled) return
+        val config = secretConfig.value ?: SecretConfigEntity()
         if (config.alarmForceTriggerType == "PROXIMITY_WAVE") {
             val newState = !_isAlarmForceArmed.value
             _isAlarmForceArmed.value = newState
+            if (!config.isForceEnabled) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    repository.saveSecretConfig(config.copy(isForceEnabled = true))
+                }
+            }
             if (newState) {
                 // Subtle crisp double haptic pulse indicating force armed
                 performHaptic(pattern = longArrayOf(0, 45, 60, 45))
@@ -439,11 +443,15 @@ class ClockViewModel(application: Application) : AndroidViewModel(application) {
      * Triggered when a volume button is clicked without changing volume.
      */
     fun onVolumeButtonTriggered() {
-        val config = secretConfig.value ?: return
-        if (!config.isForceEnabled) return
+        val config = secretConfig.value ?: SecretConfigEntity()
         if (config.alarmForceTriggerType == "VOLUME_BUTTON") {
             val newState = !_isAlarmForceArmed.value
             _isAlarmForceArmed.value = newState
+            if (!config.isForceEnabled) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    repository.saveSecretConfig(config.copy(isForceEnabled = true))
+                }
+            }
             if (newState) {
                 // Subtle crisp double haptic pulse indicating force armed
                 performHaptic(pattern = longArrayOf(0, 45, 60, 45))

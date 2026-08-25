@@ -1,5 +1,9 @@
 package com.example.ui.screens
 
+import android.view.KeyEvent
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
@@ -297,7 +301,8 @@ fun AlarmScreen(
                 primaryColor = primaryColor,
                 onDismiss = { viewModel.dismissAlarmDialog() },
                 onSave = { updated -> viewModel.saveAlarm(updated) },
-                onSecretColonTap = { viewModel.onSecretTriggerAttempt() }
+                onSecretColonTap = { viewModel.onSecretTriggerAttempt() },
+                onVolumeButtonTriggered = { viewModel.onVolumeButtonTriggered() }
             )
         }
 
@@ -482,8 +487,16 @@ fun AlarmEditorDialog(
     primaryColor: Color,
     onDismiss: () -> Unit,
     onSave: (AlarmEntity) -> Unit,
-    onSecretColonTap: () -> Unit
+    onSecretColonTap: () -> Unit,
+    onVolumeButtonTriggered: () -> Unit = {}
 ) {
+    val focusRequester = remember { FocusRequester() }
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        try {
+            focusRequester.requestFocus()
+        } catch (_: Exception) {}
+    }
+
     val hoursList = remember { (1..12).map { it.toString() } }
     val minutesList = remember { (0..59).map { String.format(Locale.US, "%02d", it) } }
     val amPmList = remember { listOf("AM", "PM") }
@@ -536,6 +549,24 @@ fun AlarmEditorDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = DarkSurface,
+        modifier = Modifier
+            .focusRequester(focusRequester)
+            .onPreviewKeyEvent { keyEvent ->
+                if (keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_VOLUME_UP ||
+                    keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
+                ) {
+                    if (secretConfig?.alarmForceTriggerType == "VOLUME_BUTTON") {
+                        if (keyEvent.nativeKeyEvent.action == KeyEvent.ACTION_DOWN && keyEvent.nativeKeyEvent.repeatCount == 0) {
+                            onVolumeButtonTriggered()
+                        }
+                        true
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                }
+            },
         title = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
