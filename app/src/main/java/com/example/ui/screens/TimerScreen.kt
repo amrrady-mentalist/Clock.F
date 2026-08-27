@@ -63,8 +63,10 @@ import com.example.ui.viewmodel.ClockViewModel
 import java.util.Locale
 
 import com.example.ui.theme.glassBorderBrush
+import com.example.ui.theme.appleThickGlass
 import com.example.ui.theme.liquidGlass
 import com.example.ui.theme.GlassSurfaceDark
+import com.example.ui.theme.GlassSurfaceElevated
 
 @Composable
 fun TimerScreen(
@@ -150,16 +152,15 @@ fun TimerScreen(
                 }
             } else {
                 // Time Duration Wheel Selector
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                    shape = RoundedCornerShape(24.dp),
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .liquidGlass(
-                            shape = RoundedCornerShape(24.dp),
+                        .appleThickGlass(
+                            shape = RoundedCornerShape(26.dp),
                             backgroundColor = GlassSurfaceDark,
-                            borderWidth = 1.dp,
-                            borderBrush = glassBorderBrush(0.4f, 0.12f, 0.04f)
+                            borderWidth = 1.2.dp,
+                            borderBrush = glassBorderBrush(0.55f, 0.18f, 0.06f),
+                            highlightAlpha = 0.35f
                         )
                         .testTag("timer_picker_card")
                 ) {
@@ -233,8 +234,13 @@ fun TimerScreen(
                 items(presetTimes) { (label, durationSec) ->
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(DarkSurfaceVariant)
+                            .appleThickGlass(
+                                shape = RoundedCornerShape(16.dp),
+                                backgroundColor = Color(0x1EFFFFFF),
+                                borderWidth = 1.dp,
+                                borderBrush = glassBorderBrush(0.40f, 0.12f, 0.04f),
+                                highlightAlpha = 0.20f
+                            )
                             .clickable {
                                 val h = durationSec / 3600
                                 val m = (durationSec % 3600) / 60
@@ -247,7 +253,7 @@ fun TimerScreen(
                             }
                             .padding(horizontal = 14.dp, vertical = 10.dp)
                     ) {
-                        Text(text = label, color = primaryColor, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        Text(text = label, color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -262,11 +268,19 @@ fun TimerScreen(
             ) {
                 if (isRunning || remainingSeconds > 0) {
                     // Reset Button
-                    Button(
-                        onClick = { viewModel.resetTimer() },
-                        colors = ButtonDefaults.buttonColors(containerColor = DarkSurfaceVariant),
-                        shape = CircleShape,
-                        modifier = Modifier.size(68.dp).testTag("timer_reset_button")
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .appleThickGlass(
+                                shape = CircleShape,
+                                backgroundColor = Color(0x22FFFFFF),
+                                borderWidth = 1.2.dp,
+                                borderBrush = glassBorderBrush(0.45f, 0.15f, 0.05f),
+                                highlightAlpha = 0.25f
+                            )
+                            .clickable { viewModel.resetTimer() }
+                            .testTag("timer_reset_button"),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
@@ -277,58 +291,76 @@ fun TimerScreen(
                     }
 
                     // Play / Pause Button
-                    Button(
-                        onClick = {
-                            if (isRunning) {
-                                viewModel.pauseTimer()
-                            } else {
-                                viewModel.startTimer()
+                    Box(
+                        modifier = Modifier
+                            .size(82.dp)
+                            .appleThickGlass(
+                                shape = CircleShape,
+                                backgroundColor = if (isRunning) Color(0xD934343E) else Color(0xFFFFFFFF),
+                                borderWidth = 1.5.dp,
+                                borderBrush = glassBorderBrush(0.80f, 0.30f, 0.10f),
+                                highlightAlpha = 0.50f
+                            )
+                            .clickable {
+                                if (isRunning) {
+                                    viewModel.pauseTimer()
+                                } else {
+                                    viewModel.startTimer()
+                                }
                             }
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = primaryColor,
-                            contentColor = Color.Black
-                        ),
-                        shape = CircleShape,
-                        modifier = Modifier.size(80.dp).testTag("timer_start_pause_button")
+                            .testTag("timer_start_pause_button"),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
                             contentDescription = if (isRunning) "Pause" else "Start",
-                            tint = Color.Black,
+                            tint = if (isRunning) Color.White else Color.Black,
                             modifier = Modifier.size(36.dp)
                         )
                     }
 
                     // +1:00 Button
-                    Button(
-                        onClick = { viewModel.addTimerSeconds(60) },
-                        colors = ButtonDefaults.buttonColors(containerColor = DarkSurfaceVariant),
-                        shape = CircleShape,
-                        modifier = Modifier.size(68.dp).testTag("timer_add_minute_button")
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .appleThickGlass(
+                                shape = CircleShape,
+                                backgroundColor = Color(0x22FFFFFF),
+                                borderWidth = 1.2.dp,
+                                borderBrush = glassBorderBrush(0.45f, 0.15f, 0.05f),
+                                highlightAlpha = 0.25f
+                            )
+                            .clickable { viewModel.addTimerSeconds(60) }
+                            .testTag("timer_add_minute_button"),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text("+1m", color = primaryColor, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        Text("+1m", color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                     }
                 } else {
                     // Start Button when idle
-                    Button(
-                        onClick = {
-                            viewModel.setTimerDuration(pickerHours, pickerMinutes, pickerSeconds)
-                            viewModel.startTimer()
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = primaryColor,
-                            contentColor = Color.Black
-                        ),
-                        shape = RoundedCornerShape(20.dp),
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp)
-                            .testTag("timer_start_initial_button")
+                            .height(58.dp)
+                            .appleThickGlass(
+                                shape = RoundedCornerShape(22.dp),
+                                backgroundColor = Color(0xFFFFFFFF),
+                                borderWidth = 1.5.dp,
+                                borderBrush = glassBorderBrush(0.85f, 0.35f, 0.10f),
+                                highlightAlpha = 0.50f
+                            )
+                            .clickable {
+                                viewModel.setTimerDuration(pickerHours, pickerMinutes, pickerSeconds)
+                                viewModel.startTimer()
+                            }
+                            .testTag("timer_start_initial_button"),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Icon(imageVector = Icons.Default.PlayArrow, contentDescription = "Start")
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Start Timer", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(imageVector = Icons.Default.PlayArrow, contentDescription = "Start", tint = Color.Black)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Start Timer", color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
             }

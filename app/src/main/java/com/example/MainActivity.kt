@@ -84,9 +84,12 @@ import com.example.ui.theme.DarkBg
 import com.example.ui.theme.DarkBgGradientBottom
 import com.example.ui.theme.DarkBgGradientTop
 import com.example.ui.theme.GlassSurfaceDark
+import com.example.ui.theme.GlassSurfaceElevated
+import com.example.ui.theme.GlassSurfacePill
 import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.TextSecondary
 import com.example.ui.theme.TextTertiary
+import com.example.ui.theme.appleThickGlass
 import com.example.ui.theme.glassBorderBrush
 import com.example.ui.theme.liquidGlass
 import com.example.ui.viewmodel.ClockViewModel
@@ -225,45 +228,14 @@ fun MainClockApp(viewModel: ClockViewModel) {
         NavTab("Timer", Icons.Filled.HourglassBottom, Icons.Outlined.HourglassBottom)
     )
 
-    // Pure Pitch Black OLED Canvas with Liquid Glass Elements
+    // Pure Pitch Black OLED Canvas with Crisp Optical Glass Elements
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        // Subtle ambient neon luminous aura (liquid glow)
-        Box(
-            modifier = Modifier
-                .size(360.dp)
-                .offset(x = (-80).dp, y = (-60).dp)
-                .background(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            primaryColor.copy(alpha = 0.08f),
-                            Color.Transparent
-                        )
-                    ),
-                    shape = CircleShape
-                )
-        )
-        Box(
-            modifier = Modifier
-                .size(300.dp)
-                .align(Alignment.BottomEnd)
-                .offset(x = 60.dp, y = 60.dp)
-                .background(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            primaryColor.copy(alpha = 0.06f),
-                            Color.Transparent
-                        )
-                    ),
-                    shape = CircleShape
-                )
-        )
-
         Column(modifier = Modifier.fillMaxSize()) {
-            // Liquid Frosted Glass Top Bar
+            // Optical Frosted Glass Top Bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -296,7 +268,7 @@ fun MainClockApp(viewModel: ClockViewModel) {
                             letterSpacing = (-0.5).sp
                         )
 
-                        // If force is active/armed, stealth glowing indicator
+                        // If force is active/armed, stealth indicator
                         val isForceActiveOnScreen = when (selectedTab) {
                             1 -> secretConfig?.isForceEnabled == true || isAlarmForceArmed
                             2 -> secretConfig?.isStopwatchForceEnabled == true || isStopwatchForceArmed
@@ -340,11 +312,12 @@ fun MainClockApp(viewModel: ClockViewModel) {
                         },
                         modifier = Modifier
                             .size(40.dp)
-                            .liquidGlass(
+                            .appleThickGlass(
                                 shape = CircleShape,
-                                backgroundColor = Color(0x12FFFFFF),
+                                backgroundColor = Color(0x1AFFFFFF),
                                 borderWidth = 1.dp,
-                                borderBrush = glassBorderBrush(0.25f, 0.08f, 0.02f)
+                                borderBrush = glassBorderBrush(0.40f, 0.12f, 0.04f),
+                                highlightAlpha = 0.25f
                             )
                             .testTag("secret_settings_entry_button")
                     ) {
@@ -381,30 +354,31 @@ fun MainClockApp(viewModel: ClockViewModel) {
             Spacer(modifier = Modifier.height(72.dp))
         }
 
-        // Apple Liquid Glass Floating Capsule Bottom Navigation Bar
+        // Apple Thick Slab Glass Floating Capsule Bottom Navigation Bar
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
-                .padding(start = 24.dp, end = 24.dp, bottom = 12.dp)
+                .padding(start = 20.dp, end = 20.dp, bottom = 12.dp)
                 .fillMaxWidth()
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .shadow(
-                        elevation = 20.dp,
+                        elevation = 16.dp,
                         shape = RoundedCornerShape(36.dp),
-                        spotColor = primaryColor.copy(alpha = 0.3f),
-                        ambientColor = Color.Black.copy(alpha = 0.7f)
+                        spotColor = Color.Black.copy(alpha = 0.85f),
+                        ambientColor = Color.Black.copy(alpha = 0.95f)
                     )
-                    .liquidGlass(
+                    .appleThickGlass(
                         shape = RoundedCornerShape(36.dp),
-                        backgroundColor = GlassSurfaceDark,
-                        borderWidth = 1.2.dp,
-                        borderBrush = glassBorderBrush(0.45f, 0.15f, 0.05f)
+                        backgroundColor = GlassSurfacePill,
+                        borderWidth = 1.25.dp,
+                        borderBrush = glassBorderBrush(0.65f, 0.22f, 0.08f),
+                        highlightAlpha = 0.45f
                     )
-                    .padding(horizontal = 8.dp, vertical = 8.dp)
+                    .padding(horizontal = 8.dp, vertical = 7.dp)
                     .testTag("bottom_nav_bar")
             ) {
                 Row(
@@ -415,7 +389,7 @@ fun MainClockApp(viewModel: ClockViewModel) {
                     tabs.forEachIndexed { index, tab ->
                         val isSelected = selectedTab == index
                         val iconColor by animateColorAsState(
-                            targetValue = if (isSelected) primaryColor else TextTertiary,
+                            targetValue = if (isSelected) Color.White else TextTertiary,
                             label = "IconColor"
                         )
                         val textColor by animateColorAsState(
@@ -425,10 +399,19 @@ fun MainClockApp(viewModel: ClockViewModel) {
 
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(24.dp))
-                                .background(
-                                    if (isSelected) primaryColor.copy(alpha = 0.16f)
-                                    else Color.Transparent
+                                .clip(RoundedCornerShape(22.dp))
+                                .then(
+                                    if (isSelected) {
+                                        Modifier.appleThickGlass(
+                                            shape = RoundedCornerShape(22.dp),
+                                            backgroundColor = Color(0x38FFFFFF),
+                                            borderWidth = 1.dp,
+                                            borderBrush = glassBorderBrush(0.55f, 0.18f, 0.06f),
+                                            highlightAlpha = 0.30f
+                                        )
+                                    } else {
+                                        Modifier
+                                    }
                                 )
                                 .clickable(
                                     interactionSource = remember { MutableInteractionSource() },
@@ -436,7 +419,7 @@ fun MainClockApp(viewModel: ClockViewModel) {
                                 ) {
                                     viewModel.selectTab(index)
                                 }
-                                .padding(horizontal = 14.dp, vertical = 8.dp)
+                                .padding(horizontal = 14.dp, vertical = 7.dp)
                                 .testTag("nav_tab_${tab.title.lowercase()}"),
                             contentAlignment = Alignment.Center
                         ) {

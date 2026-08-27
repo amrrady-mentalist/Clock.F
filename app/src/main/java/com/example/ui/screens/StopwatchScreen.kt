@@ -2,6 +2,7 @@ package com.example.ui.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -58,8 +59,10 @@ import com.example.ui.viewmodel.ClockViewModel
 import java.util.Locale
 
 import com.example.ui.theme.glassBorderBrush
+import com.example.ui.theme.appleThickGlass
 import com.example.ui.theme.liquidGlass
 import com.example.ui.theme.GlassSurfaceDark
+import com.example.ui.theme.GlassSurfaceElevated
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -154,22 +157,26 @@ fun StopwatchScreen(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Lap / Reset Button
-            Button(
-                onClick = {
-                    if (isRunning) {
-                        viewModel.recordLap()
-                    } else {
-                        viewModel.resetStopwatch()
+            // Lap / Reset Button (Apple Thick Glass Pill/Circle)
+            Box(
+                modifier = Modifier
+                    .size(74.dp)
+                    .appleThickGlass(
+                        shape = CircleShape,
+                        backgroundColor = if (totalTimeMs > 0) Color(0x28FFFFFF) else Color(0x12FFFFFF),
+                        borderWidth = 1.2.dp,
+                        borderBrush = glassBorderBrush(0.45f, 0.15f, 0.05f),
+                        highlightAlpha = if (totalTimeMs > 0) 0.30f else 0.10f
+                    )
+                    .clickable(enabled = totalTimeMs > 0) {
+                        if (isRunning) {
+                            viewModel.recordLap()
+                        } else {
+                            viewModel.resetStopwatch()
+                        }
                     }
-                },
-                enabled = totalTimeMs > 0,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = DarkSurfaceVariant,
-                    disabledContainerColor = DarkSurfaceVariant.copy(alpha = 0.4f)
-                ),
-                shape = CircleShape,
-                modifier = Modifier.size(72.dp).testTag("lap_reset_button")
+                    .testTag("lap_reset_button"),
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = if (isRunning) Icons.Default.Flag else Icons.Default.Refresh,
@@ -179,26 +186,31 @@ fun StopwatchScreen(
                 )
             }
 
-            // Start / Pause Button
-            Button(
-                onClick = {
-                    if (isRunning) {
-                        viewModel.pauseStopwatch()
-                    } else {
-                        viewModel.startStopwatch()
+            // Start / Pause Button (Apple Refractive White Glass Dial/Circle)
+            Box(
+                modifier = Modifier
+                    .size(82.dp)
+                    .appleThickGlass(
+                        shape = CircleShape,
+                        backgroundColor = if (isRunning) Color(0xD934343E) else Color(0xFFFFFFFF),
+                        borderWidth = 1.5.dp,
+                        borderBrush = glassBorderBrush(0.80f, 0.30f, 0.10f),
+                        highlightAlpha = 0.50f
+                    )
+                    .clickable {
+                        if (isRunning) {
+                            viewModel.pauseStopwatch()
+                        } else {
+                            viewModel.startStopwatch()
+                        }
                     }
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = primaryColor,
-                    contentColor = Color.Black
-                ),
-                shape = CircleShape,
-                modifier = Modifier.size(80.dp).testTag("start_pause_stopwatch_button")
+                    .testTag("start_pause_stopwatch_button"),
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
                     contentDescription = if (isRunning) "Pause" else "Start",
-                    tint = Color.Black,
+                    tint = if (isRunning) Color.White else Color.Black,
                     modifier = Modifier.size(36.dp)
                 )
             }
@@ -208,17 +220,16 @@ fun StopwatchScreen(
 
         // Laps List
         if (laps.isNotEmpty()) {
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                shape = RoundedCornerShape(20.dp),
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .liquidGlass(
-                        shape = RoundedCornerShape(20.dp),
+                    .appleThickGlass(
+                        shape = RoundedCornerShape(24.dp),
                         backgroundColor = GlassSurfaceDark,
-                        borderWidth = 1.dp,
-                        borderBrush = glassBorderBrush(0.35f, 0.1f, 0.03f)
+                        borderWidth = 1.2.dp,
+                        borderBrush = glassBorderBrush(0.55f, 0.18f, 0.06f),
+                        highlightAlpha = 0.35f
                     )
                     .testTag("laps_card")
             ) {

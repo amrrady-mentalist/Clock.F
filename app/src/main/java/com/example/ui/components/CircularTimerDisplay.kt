@@ -63,13 +63,12 @@ fun CircularProgressTimer(
                 size = arcSize
             )
 
-            // Active Glowing Progress Arc
+            // Active Progress Arc
             if (animatedProgress > 0.001f) {
                 drawArc(
                     brush = Brush.sweepGradient(
-                        0.0f to activeColor.copy(alpha = 0.8f),
-                        0.7f to activeColor,
-                        1.0f to AmberAccent
+                        0.0f to activeColor.copy(alpha = 0.85f),
+                        1.0f to activeColor
                     ),
                     startAngle = -90f,
                     sweepAngle = animatedProgress * 360f,
