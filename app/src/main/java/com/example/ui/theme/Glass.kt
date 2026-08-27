@@ -19,27 +19,27 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-// Apple Optical & Thick Slab Glass Palette
+// Apple Optical & Frosted Slab Glass Palette
 val GlassBase = Color(0x28FFFFFF)
 val GlassSurface = Color(0x14FFFFFF)
 val GlassSurfaceElevated = Color(0x22FFFFFF)
-val GlassSurfaceDark = Color(0xD9101015)       // Deep optical smoky glass
-val GlassSurfacePill = Color(0xE614141C)       // High-density floating capsule glass
-val GlassSurfaceUltraDark = Color(0xF209090D)
+val GlassSurfaceDark = Color(0xC7131722)       // Frosted optical smoky glass (~78% opacity)
+val GlassSurfacePill = Color(0xC7131722)       // Frosted slab capsule glass matching bottom bar
+val GlassSurfaceChip = Color(0xC7131722)       // Frosted button & chip glass
+val GlassSurfaceUltraDark = Color(0xD90A0D14)
 
-val GlassBorderLight = Color(0x59FFFFFF)
-val GlassBorderMuted = Color(0x1FFFFFFF)
-val GlassBorderSubtle = Color(0x0FFFFFFF)
+val GlassBorderLight = Color(0x66FFFFFF)
+val GlassBorderMuted = Color(0x24FFFFFF)
+val GlassBorderSubtle = Color(0x12FFFFFF)
 
 /**
- * Specular edge gradient for Apple-style thick slab glass.
- * Simulates directional light hitting the top-left chamfer/bevel edge with high refraction,
- * and diffusing toward the shadowed bottom-right edge.
+ * Specular edge gradient for Apple-style liquid slab glass.
+ * Directional subtle light reflection across the perimeter.
  */
 fun glassBorderBrush(
-    startAlpha: Float = 0.55f,
-    midAlpha: Float = 0.18f,
-    endAlpha: Float = 0.05f
+    startAlpha: Float = 0.60f,
+    midAlpha: Float = 0.20f,
+    endAlpha: Float = 0.08f
 ): Brush = Brush.linearGradient(
     colors = listOf(
         Color.White.copy(alpha = startAlpha),
@@ -51,54 +51,26 @@ fun glassBorderBrush(
 )
 
 /**
- * Creates a thick slab glass look with simulated refraction, specular highlight top rim,
- * and ambient edge depth.
+ * Apple-style liquid glass modifier matching the clean bottom navigation bar.
+ * Uses a uniform frosted glass background with a directional specular border.
  */
 fun Modifier.appleThickGlass(
     shape: Shape = RoundedCornerShape(24.dp),
-    backgroundColor: Color = GlassSurfaceDark,
+    backgroundColor: Color = GlassSurfacePill,
     borderWidth: Dp = 1.2.dp,
-    borderBrush: Brush = glassBorderBrush(0.55f, 0.16f, 0.06f),
-    highlightAlpha: Float = 0.35f
+    borderBrush: Brush = glassBorderBrush(0.60f, 0.20f, 0.08f),
+    highlightAlpha: Float = 0f
 ): Modifier = this
     .clip(shape)
-    .background(
-        brush = Brush.linearGradient(
-            colors = listOf(
-                backgroundColor.copy(alpha = (backgroundColor.alpha * 1.15f).coerceAtMost(0.98f)),
-                backgroundColor,
-                backgroundColor.copy(alpha = (backgroundColor.alpha * 0.88f).coerceAtLeast(0.1f))
-            ),
-            start = Offset(0f, 0f),
-            end = Offset(0f, Float.POSITIVE_INFINITY)
-        )
-    )
-    .drawBehind {
-        // Specular Top Rim Refraction Glint (Apple Slab Glass light dispersion)
-        if (highlightAlpha > 0f) {
-            val highlightHeight = 1.5.dp.toPx()
-            drawRect(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        Color.White.copy(alpha = 0.05f),
-                        Color.White.copy(alpha = highlightAlpha),
-                        Color.White.copy(alpha = highlightAlpha * 0.8f),
-                        Color.White.copy(alpha = 0.05f)
-                    )
-                ),
-                topLeft = Offset(0f, 0f),
-                size = Size(size.width, highlightHeight)
-            )
-        }
-    }
+    .background(color = backgroundColor, shape = shape)
     .border(width = borderWidth, brush = borderBrush, shape = shape)
 
-// Backward compatible liquidGlass modifier using updated thick optical glass system
+// Liquid glass modifier alias
 fun Modifier.liquidGlass(
     shape: Shape = RoundedCornerShape(24.dp),
-    backgroundColor: Color = GlassSurfaceDark,
-    borderWidth: Dp = 1.dp,
-    borderBrush: Brush = glassBorderBrush(0.50f, 0.15f, 0.05f)
+    backgroundColor: Color = GlassSurfacePill,
+    borderWidth: Dp = 1.2.dp,
+    borderBrush: Brush = glassBorderBrush(0.60f, 0.20f, 0.08f)
 ): Modifier = this.appleThickGlass(
     shape = shape,
     backgroundColor = backgroundColor,

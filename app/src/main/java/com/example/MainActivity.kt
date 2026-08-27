@@ -314,10 +314,9 @@ fun MainClockApp(viewModel: ClockViewModel) {
                             .size(40.dp)
                             .appleThickGlass(
                                 shape = CircleShape,
-                                backgroundColor = Color(0x1AFFFFFF),
-                                borderWidth = 1.dp,
-                                borderBrush = glassBorderBrush(0.40f, 0.12f, 0.04f),
-                                highlightAlpha = 0.25f
+                                backgroundColor = GlassSurfacePill,
+                                borderWidth = 1.2.dp,
+                                borderBrush = glassBorderBrush(0.60f, 0.20f, 0.08f)
                             )
                             .testTag("secret_settings_entry_button")
                     ) {
@@ -331,7 +330,7 @@ fun MainClockApp(viewModel: ClockViewModel) {
                 }
             }
 
-            // Main Screen Content Area
+            // Main Screen Content Area (Fills all the way to bottom edge beneath the floating glass bar)
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -350,8 +349,6 @@ fun MainClockApp(viewModel: ClockViewModel) {
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(72.dp))
         }
 
         // Apple Thick Slab Glass Floating Capsule Bottom Navigation Bar
@@ -365,18 +362,12 @@ fun MainClockApp(viewModel: ClockViewModel) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(
-                        elevation = 16.dp,
-                        shape = RoundedCornerShape(36.dp),
-                        spotColor = Color.Black.copy(alpha = 0.85f),
-                        ambientColor = Color.Black.copy(alpha = 0.95f)
-                    )
                     .appleThickGlass(
                         shape = RoundedCornerShape(36.dp),
                         backgroundColor = GlassSurfacePill,
                         borderWidth = 1.25.dp,
                         borderBrush = glassBorderBrush(0.65f, 0.22f, 0.08f),
-                        highlightAlpha = 0.45f
+                        highlightAlpha = 0.40f
                     )
                     .padding(horizontal = 8.dp, vertical = 7.dp)
                     .testTag("bottom_nav_bar")

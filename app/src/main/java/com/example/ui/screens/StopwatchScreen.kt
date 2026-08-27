@@ -62,6 +62,7 @@ import com.example.ui.theme.glassBorderBrush
 import com.example.ui.theme.appleThickGlass
 import com.example.ui.theme.liquidGlass
 import com.example.ui.theme.GlassSurfaceDark
+import com.example.ui.theme.GlassSurfacePill
 import com.example.ui.theme.GlassSurfaceElevated
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -157,16 +158,15 @@ fun StopwatchScreen(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Lap / Reset Button (Apple Thick Glass Pill/Circle)
+            // Lap / Reset Button (Apple Liquid Glass Pill/Circle)
             Box(
                 modifier = Modifier
                     .size(74.dp)
                     .appleThickGlass(
                         shape = CircleShape,
-                        backgroundColor = if (totalTimeMs > 0) Color(0x28FFFFFF) else Color(0x12FFFFFF),
+                        backgroundColor = GlassSurfacePill,
                         borderWidth = 1.2.dp,
-                        borderBrush = glassBorderBrush(0.45f, 0.15f, 0.05f),
-                        highlightAlpha = if (totalTimeMs > 0) 0.30f else 0.10f
+                        borderBrush = glassBorderBrush(0.60f, 0.20f, 0.08f)
                     )
                     .clickable(enabled = totalTimeMs > 0) {
                         if (isRunning) {
@@ -186,16 +186,15 @@ fun StopwatchScreen(
                 )
             }
 
-            // Start / Pause Button (Apple Refractive White Glass Dial/Circle)
+            // Start / Pause Button (Apple Refractive Glass Circle)
             Box(
                 modifier = Modifier
                     .size(82.dp)
                     .appleThickGlass(
                         shape = CircleShape,
-                        backgroundColor = if (isRunning) Color(0xD934343E) else Color(0xFFFFFFFF),
+                        backgroundColor = if (isRunning) GlassSurfacePill else Color.White,
                         borderWidth = 1.5.dp,
-                        borderBrush = glassBorderBrush(0.80f, 0.30f, 0.10f),
-                        highlightAlpha = 0.50f
+                        borderBrush = if (isRunning) glassBorderBrush(0.60f, 0.20f, 0.08f) else glassBorderBrush(0.85f, 0.35f, 0.15f)
                     )
                     .clickable {
                         if (isRunning) {

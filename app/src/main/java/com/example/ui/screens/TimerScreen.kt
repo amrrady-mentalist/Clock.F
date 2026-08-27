@@ -66,6 +66,7 @@ import com.example.ui.theme.glassBorderBrush
 import com.example.ui.theme.appleThickGlass
 import com.example.ui.theme.liquidGlass
 import com.example.ui.theme.GlassSurfaceDark
+import com.example.ui.theme.GlassSurfacePill
 import com.example.ui.theme.GlassSurfaceElevated
 
 @Composable
@@ -236,10 +237,9 @@ fun TimerScreen(
                         modifier = Modifier
                             .appleThickGlass(
                                 shape = RoundedCornerShape(16.dp),
-                                backgroundColor = Color(0x1EFFFFFF),
+                                backgroundColor = GlassSurfacePill,
                                 borderWidth = 1.dp,
-                                borderBrush = glassBorderBrush(0.40f, 0.12f, 0.04f),
-                                highlightAlpha = 0.20f
+                                borderBrush = glassBorderBrush(0.50f, 0.18f, 0.06f)
                             )
                             .clickable {
                                 val h = durationSec / 3600
@@ -273,10 +273,9 @@ fun TimerScreen(
                             .size(72.dp)
                             .appleThickGlass(
                                 shape = CircleShape,
-                                backgroundColor = Color(0x22FFFFFF),
+                                backgroundColor = GlassSurfacePill,
                                 borderWidth = 1.2.dp,
-                                borderBrush = glassBorderBrush(0.45f, 0.15f, 0.05f),
-                                highlightAlpha = 0.25f
+                                borderBrush = glassBorderBrush(0.60f, 0.20f, 0.08f)
                             )
                             .clickable { viewModel.resetTimer() }
                             .testTag("timer_reset_button"),
@@ -296,10 +295,9 @@ fun TimerScreen(
                             .size(82.dp)
                             .appleThickGlass(
                                 shape = CircleShape,
-                                backgroundColor = if (isRunning) Color(0xD934343E) else Color(0xFFFFFFFF),
+                                backgroundColor = if (isRunning) GlassSurfacePill else Color.White,
                                 borderWidth = 1.5.dp,
-                                borderBrush = glassBorderBrush(0.80f, 0.30f, 0.10f),
-                                highlightAlpha = 0.50f
+                                borderBrush = if (isRunning) glassBorderBrush(0.60f, 0.20f, 0.08f) else glassBorderBrush(0.85f, 0.35f, 0.15f)
                             )
                             .clickable {
                                 if (isRunning) {
@@ -325,10 +323,9 @@ fun TimerScreen(
                             .size(72.dp)
                             .appleThickGlass(
                                 shape = CircleShape,
-                                backgroundColor = Color(0x22FFFFFF),
+                                backgroundColor = GlassSurfacePill,
                                 borderWidth = 1.2.dp,
-                                borderBrush = glassBorderBrush(0.45f, 0.15f, 0.05f),
-                                highlightAlpha = 0.25f
+                                borderBrush = glassBorderBrush(0.60f, 0.20f, 0.08f)
                             )
                             .clickable { viewModel.addTimerSeconds(60) }
                             .testTag("timer_add_minute_button"),
