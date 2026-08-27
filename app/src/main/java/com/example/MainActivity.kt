@@ -98,7 +98,7 @@ data class NavTab(
 )
 
 class MainActivity : ComponentActivity(), SensorEventListener {
-    private val viewModel: ClockViewModel by viewModels()
+    internal val viewModel: ClockViewModel by viewModels()
     private var sensorManager: SensorManager? = null
     private var proximitySensor: Sensor? = null
     private var isNear = false
@@ -147,7 +147,11 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         if (event == null || event.sensor.type != Sensor.TYPE_PROXIMITY) return
         val distance = event.values.firstOrNull() ?: return
         val maxRange = event.sensor.maximumRange
-        val near = distance < 5.0f || (maxRange > 0 && distance < maxRange)
+        val near = if (maxRange <= 1.0f) {
+            distance < 0.5f
+        } else {
+            distance < minOf(maxRange, 4.0f) && distance < maxRange
+        }
         
         // Detect state transition from far to near (hand wave over proximity sensor)
         if (near && !isNear) {
@@ -161,11 +165,16 @@ class MainActivity : ComponentActivity(), SensorEventListener {
     /**
      * Intercept volume button presses without changing volume slider
      */
+    private fun isVolumeTriggerConfigured(): Boolean {
+        val secretConfig = viewModel.secretConfig.value ?: return false
+        val isAlarmVolume = secretConfig.alarmForceTriggerType in listOf("VOLUME_BUTTON", "WAVE_OR_VOLUME")
+        val isStopwatchVolume = secretConfig.stopwatchForceTriggerType in listOf("VOLUME_BUTTON", "WAVE_OR_VOLUME")
+        return isAlarmVolume || isStopwatchVolume
+    }
+
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (event.keyCode == KeyEvent.KEYCODE_VOLUME_UP || event.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            val secretConfig = viewModel.secretConfig.value
-            // If the volume button trigger is selected in secret settings, intercept it secretly
-            if (secretConfig?.alarmForceTriggerType == "VOLUME_BUTTON") {
+            if (isVolumeTriggerConfigured()) {
                 if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0) {
                     viewModel.onVolumeButtonTriggered()
                 }
@@ -178,11 +187,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            val secretConfig = viewModel.secretConfig.value
-            if (secretConfig?.alarmForceTriggerType == "VOLUME_BUTTON") {
-                if (event?.repeatCount == 0) {
-                    viewModel.onVolumeButtonTriggered()
-                }
+            if (isVolumeTriggerConfigured()) {
                 return true
             }
         }
@@ -191,8 +196,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            val secretConfig = viewModel.secretConfig.value
-            if (secretConfig?.alarmForceTriggerType == "VOLUME_BUTTON") {
+            if (isVolumeTriggerConfigured()) {
                 return true
             }
         }
@@ -207,6 +211,7 @@ fun MainClockApp(viewModel: ClockViewModel) {
     val showPinPrompt by viewModel.showPinPrompt.collectAsState()
     val secretConfig by viewModel.secretConfig.collectAsState()
     val isAlarmForceArmed by viewModel.isAlarmForceArmed.collectAsState()
+    val isStopwatchForceArmed by viewModel.isStopwatchForceArmed.collectAsState()
 
     var dotsTapCount by remember { mutableIntStateOf(0) }
     var lastDotsTapTime by remember { mutableLongStateOf(0L) }
@@ -292,9 +297,20 @@ fun MainClockApp(viewModel: ClockViewModel) {
                         )
 
                         // If force is active/armed, stealth glowing indicator
-                        if (secretConfig?.isForceEnabled == true) {
+                        val isForceActiveOnScreen = when (selectedTab) {
+                            1 -> secretConfig?.isForceEnabled == true || isAlarmForceArmed
+                            2 -> secretConfig?.isStopwatchForceEnabled == true || isStopwatchForceArmed
+                            else -> (secretConfig?.isForceEnabled == true) || (secretConfig?.isStopwatchForceEnabled == true) || isAlarmForceArmed || isStopwatchForceArmed
+                        }
+
+                        if (isForceActiveOnScreen) {
                             Spacer(modifier = Modifier.width(8.dp))
-                            val isArmed = if (secretConfig?.alarmForceTriggerType == "ALWAYS") true else isAlarmForceArmed
+                            val isArmed = when (selectedTab) {
+                                1 -> if (secretConfig?.alarmForceTriggerType == "ALWAYS") secretConfig?.isForceEnabled == true else isAlarmForceArmed
+                                2 -> if (secretConfig?.stopwatchForceTriggerType == "ALWAYS") secretConfig?.isStopwatchForceEnabled == true else isStopwatchForceArmed
+                                else -> (if (secretConfig?.alarmForceTriggerType == "ALWAYS") secretConfig?.isForceEnabled == true else isAlarmForceArmed) ||
+                                        (if (secretConfig?.stopwatchForceTriggerType == "ALWAYS") secretConfig?.isStopwatchForceEnabled == true else isStopwatchForceArmed)
+                            }
                             Box(
                                 modifier = Modifier
                                     .size(6.dp)

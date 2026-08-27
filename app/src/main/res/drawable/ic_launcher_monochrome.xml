@@ -5,90 +5,86 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- 12 Major Hour Tick Marks -->
-    <path android:pathData="M54,25.2 L54,28.8" android:strokeWidth="1.6" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
-    <path android:pathData="M68.5,29.2 L66.7,32.3" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
-    <path android:pathData="M78.8,39.5 L75.7,41.3" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
-    <path android:pathData="M82.8,54 L79.2,54" android:strokeWidth="1.6" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
-    <path android:pathData="M78.8,68.5 L75.7,66.7" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
-    <path android:pathData="M68.5,78.8 L66.7,75.7" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
-    <path android:pathData="M54,82.8 L54,79.2" android:strokeWidth="1.6" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
-    <path android:pathData="M39.5,78.8 L41.3,75.7" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
-    <path android:pathData="M29.2,68.5 L32.3,66.7" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
-    <path android:pathData="M25.2,54 L28.8,54" android:strokeWidth="1.6" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
-    <path android:pathData="M29.2,39.5 L32.3,41.3" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
-    <path android:pathData="M39.5,29.2 L41.3,32.3" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
+    <!-- Dial Bezel Rim -->
+    <path
+        android:pathData="M54,54m-33,0a33,33 0 1,1 66,0a33,33 0 1,1 -66,0"
+        android:strokeWidth="1.0"
+        android:strokeColor="#FFFFFF" />
 
-    <!-- Cardinal Numerals in Authentic Roboto Typography -->
-    <!-- "12" at Top -->
-    <!-- Digit 1 (Roboto: straight stem, clean angled top spur, no baseline serif) -->
+    <!-- 48 Sub-Minute Fine Ticks -->
     <path
-        android:pathData="M47.2,33.2 L49.0,31.8 L49.0,38.5"
-        android:strokeWidth="1.5"
+        android:pathData="
+            M57.2,23.7 L57.0,25.7 M60.3,24.2 L59.9,26.1 M63.4,25.0 L62.8,26.9 M66.4,26.1 L65.6,28.0
+            M71.9,29.3 L70.8,30.9 M74.4,31.3 L73.1,32.8 M76.7,33.6 L75.2,34.9 M78.7,36.1 L77.1,37.2
+            M81.9,41.6 L80.0,42.4 M83.0,44.6 L81.1,45.2 M83.8,47.7 L81.9,48.1 M84.3,50.8 L82.3,51.0
+            M84.3,57.2 L82.3,57.0 M83.8,60.3 L81.9,59.9 M83.0,63.4 L81.1,62.8 M81.9,66.4 L80.0,65.6
+            M78.7,71.9 L77.1,70.8 M76.7,74.4 L75.2,73.1 M74.4,76.7 L73.1,75.2 M71.9,78.7 L70.8,77.1
+            M66.4,81.9 L65.6,80.0 M63.4,83.0 L62.8,81.1 M60.3,83.8 L59.9,81.9 M57.2,84.3 L57.0,82.3
+            M50.8,84.3 L51.0,82.3 M47.7,83.8 L48.1,81.9 M44.6,83.0 L45.2,81.1 M41.6,81.9 L42.4,80.0
+            M36.1,78.7 L37.2,77.1 M33.6,76.7 L34.9,75.2 M31.3,74.4 L32.8,73.1 M29.3,71.9 L30.9,70.8
+            M26.1,66.4 L28.0,65.6 M25.0,63.4 L26.9,62.8 M24.2,60.3 L26.1,59.9 M23.7,57.2 L25.7,57.0
+            M23.7,50.8 L25.7,51.0 M24.2,47.7 L26.1,48.1 M25.0,44.6 L26.9,45.2 M26.1,41.6 L28.0,42.4
+            M29.3,36.1 L30.9,37.2 M31.3,33.6 L32.8,34.9 M33.6,31.3 L34.9,32.8 M36.1,29.3 L37.2,30.9
+            M41.6,26.1 L42.4,28.0 M44.6,25.0 L45.2,26.9 M47.7,24.2 L48.1,26.1 M50.8,23.7 L51.0,25.7"
+        android:strokeWidth="0.8"
         android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round" />
-    <!-- Digit 2 (Roboto: smooth arched crown, clean diagonal sweep, flat horizontal baseline) -->
-    <path
-        android:pathData="M53.8,33.4 C53.8,32.3 54.9,31.8 56.5,31.8 C58.1,31.8 59.2,32.5 59.2,33.8 C59.2,35.4 57.4,36.9 54.4,38.5 L59.4,38.5"
-        android:strokeWidth="1.5"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round" />
+        android:strokeLineCap="round" />
 
-    <!-- "3" at Right (Roboto: clean rounded upper/lower bowls with center cusp) -->
-    <path
-        android:pathData="M72.2,52.2 C72.8,51.4 73.8,51.0 74.8,51.0 C76.2,51.0 77.0,51.8 77.0,53.0 C77.0,54.2 76.0,54.8 74.5,54.8 C76.2,54.8 77.2,55.6 77.2,57.0 C77.2,58.4 76.0,59.2 74.5,59.2 C73.2,59.2 72.2,58.6 71.8,57.8"
-        android:strokeWidth="1.5"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round" />
+    <!-- 8 Standard Hour Tick Marks -->
+    <!-- 1 o'clock -->
+    <path android:pathData="M69.2,27.6 L67.2,31.1" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
+    <!-- 2 o'clock -->
+    <path android:pathData="M80.4,38.8 L76.9,40.8" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
+    <!-- 4 o'clock -->
+    <path android:pathData="M80.4,69.2 L76.9,67.2" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
+    <!-- 5 o'clock -->
+    <path android:pathData="M69.2,80.4 L67.2,76.9" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
+    <!-- 7 o'clock -->
+    <path android:pathData="M38.8,80.4 L40.8,76.9" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
+    <!-- 8 o'clock -->
+    <path android:pathData="M27.6,69.3 L31.1,67.3" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
+    <!-- 10 o'clock -->
+    <path android:pathData="M27.6,38.8 L31.1,40.8" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
+    <!-- 11 o'clock -->
+    <path android:pathData="M38.7,27.6 L40.7,31.1" android:strokeWidth="1.4" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
 
-    <!-- "6" at Bottom (Roboto: smooth descending spine from top right, oval loop at bottom) -->
-    <path
-        android:pathData="M56.6,71.2 C55.6,70.5 54.4,70.2 53.6,70.2 C51.2,70.2 49.8,72.2 49.8,75.0 C49.8,77.5 51.5,79.0 53.8,79.0 C56.4,79.0 58.0,77.3 58.0,75.0 C58.0,72.8 56.4,71.2 53.8,71.2 C52.0,71.2 50.4,72.4 50.0,75.0"
-        android:strokeWidth="1.5"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round" />
-
-    <!-- "9" at Left (Roboto: oval loop at top, smooth tail sweeping to bottom left) -->
-    <path
-        android:pathData="M31.2,57.2 C32.2,57.9 33.4,58.2 34.2,58.2 C36.6,58.2 38.0,56.2 38.0,53.4 C38.0,50.9 36.3,49.4 34.0,49.4 C31.4,49.4 29.8,51.1 29.8,53.4 C29.8,55.6 31.4,57.2 34.0,57.2 C35.8,57.2 37.4,56.0 37.8,53.4"
-        android:strokeWidth="1.5"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round" />
+    <!-- 4 Prominent Bolder Cardinal Hour Dashes (12, 3, 6, 9) -->
+    <!-- 12 o'clock (Top) -->
+    <path android:pathData="M54.0,23.5 L54.0,28.5" android:strokeWidth="2.2" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
+    <!-- 3 o'clock (Right) -->
+    <path android:pathData="M84.5,54.0 L79.5,54.0" android:strokeWidth="2.2" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
+    <!-- 6 o'clock (Bottom) -->
+    <path android:pathData="M54.0,84.5 L54.0,79.5" android:strokeWidth="2.2" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
+    <!-- 9 o'clock (Left) -->
+    <path android:pathData="M23.5,54.0 L28.5,54.0" android:strokeWidth="2.2" android:strokeColor="#FFFFFF" android:strokeLineCap="round" />
 
     <!-- Hour Hand -->
     <path
-        android:pathData="M54,54 L53.5,67"
+        android:pathData="M52.0,52.6 L67.9,63.8"
         android:strokeWidth="3.6"
         android:strokeColor="#FFFFFF"
         android:strokeLineCap="round" />
 
     <!-- Minute Hand -->
     <path
-        android:pathData="M54,54 L71,51"
-        android:strokeWidth="3.2"
+        android:pathData="M52.5,54.9 L75.2,41.7"
+        android:strokeWidth="2.5"
         android:strokeColor="#FFFFFF"
         android:strokeLineCap="round" />
 
     <!-- Second Hand -->
     <path
-        android:pathData="M49.5,61.5 L54,54"
-        android:strokeWidth="1.6"
+        android:pathData="M57.1,60.8 L42.6,28.4"
+        android:strokeWidth="1.0"
         android:strokeColor="#FFFFFF"
         android:strokeLineCap="round" />
     <path
-        android:pathData="M54,54 L64.5,33.5"
-        android:strokeWidth="1.2"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
+        android:pathData="M56.4,59.5m-1.2,0a1.2,1.2 0 1,1 2.4,0a1.2,1.2 0 1,1 -2.4,0"
+        android:fillColor="#FFFFFF" />
 
-    <!-- Center Pivot Cap -->
+    <!-- Center Pivot Pin -->
     <path
-        android:pathData="M54,54m-3.5,0a3.5,3.5 0 1,1 7,0a3.5,3.5 0 1,1 -7,0"
+        android:pathData="M54,54m-2.8,0a2.8,2.8 0 1,1 5.6,0a2.8,2.8 0 1,1 -5.6,0"
         android:fillColor="#FFFFFF" />
 
 </vector>

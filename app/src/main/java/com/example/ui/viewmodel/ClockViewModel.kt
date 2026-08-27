@@ -113,18 +113,22 @@ class ClockViewModel(application: Application) : AndroidViewModel(application) {
     private val _isAlarmForceArmed = MutableStateFlow(false)
     val isAlarmForceArmed = _isAlarmForceArmed.asStateFlow()
 
+    // Stopwatch force dynamic arm state (for PROXIMITY_WAVE, VOLUME_BUTTON, WAVE_OR_VOLUME triggers)
+    private val _isStopwatchForceArmed = MutableStateFlow(false)
+    val isStopwatchForceArmed = _isStopwatchForceArmed.asStateFlow()
+
     init {
         val database = AppDatabase.getDatabase(application, viewModelScope)
         repository = ClockRepository(database.clockDao())
 
         alarms = repository.allAlarms
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
         worldCities = repository.allWorldCities
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
         secretConfig = repository.secretConfig
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SecretConfigEntity())
+            .stateIn(viewModelScope, SharingStarted.Eagerly, SecretConfigEntity())
 
         // Start clock ticker
         viewModelScope.launch(Dispatchers.Default) {
@@ -258,10 +262,10 @@ class ClockViewModel(application: Application) : AndroidViewModel(application) {
         val currentMs = _stopwatchTimeMs.value
         val config = secretConfig.value
 
-        val isForceEnabled = config?.isStopwatchForceEnabled == true
+        val isArmed = isStopwatchForceEffectivelyActive()
         val targetTriggerStop = config?.stopwatchForceTriggerStopCount ?: 1
         // targetTriggerStop == 0 means Every Stop, otherwise trigger exactly on the Nth stop
-        val shouldForce = isForceEnabled && (targetTriggerStop == 0 || stopwatchStopCount == targetTriggerStop)
+        val shouldForce = isArmed && (targetTriggerStop == 0 || stopwatchStopCount == targetTriggerStop)
 
         if (shouldForce) {
             val forcedCentis = config?.forcedStopwatchCentiseconds?.coerceIn(0, 99) ?: 37
@@ -409,10 +413,17 @@ class ClockViewModel(application: Application) : AndroidViewModel(application) {
 
     fun isAlarmForceEffectivelyActive(): Boolean {
         val config = secretConfig.value ?: return false
-        if (!config.isForceEnabled) return false
         return when (config.alarmForceTriggerType) {
-            "PROXIMITY_WAVE", "VOLUME_BUTTON" -> _isAlarmForceArmed.value
-            else -> true // "ALWAYS"
+            "PROXIMITY_WAVE", "VOLUME_BUTTON", "WAVE_OR_VOLUME" -> _isAlarmForceArmed.value
+            else -> config.isForceEnabled
+        }
+    }
+
+    fun isStopwatchForceEffectivelyActive(): Boolean {
+        val config = secretConfig.value ?: return false
+        return when (config.stopwatchForceTriggerType) {
+            "PROXIMITY_WAVE", "VOLUME_BUTTON", "WAVE_OR_VOLUME" -> _isStopwatchForceArmed.value
+            else -> config.isStopwatchForceEnabled
         }
     }
 
@@ -421,15 +432,35 @@ class ClockViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun onProximityWaveDetected() {
         val config = secretConfig.value ?: SecretConfigEntity()
-        if (config.alarmForceTriggerType == "PROXIMITY_WAVE") {
-            val newState = !_isAlarmForceArmed.value
-            _isAlarmForceArmed.value = newState
+        var stateChanged = false
+        var isArmedNow = false
+
+        if (config.alarmForceTriggerType in listOf("PROXIMITY_WAVE", "WAVE_OR_VOLUME")) {
+            val newAlarmArmed = !_isAlarmForceArmed.value
+            _isAlarmForceArmed.value = newAlarmArmed
+            stateChanged = true
+            isArmedNow = newAlarmArmed
             if (!config.isForceEnabled) {
                 viewModelScope.launch(Dispatchers.IO) {
                     repository.saveSecretConfig(config.copy(isForceEnabled = true))
                 }
             }
-            if (newState) {
+        }
+
+        if (config.stopwatchForceTriggerType in listOf("PROXIMITY_WAVE", "WAVE_OR_VOLUME")) {
+            val newStopwatchArmed = !_isStopwatchForceArmed.value
+            _isStopwatchForceArmed.value = newStopwatchArmed
+            stateChanged = true
+            isArmedNow = isArmedNow || newStopwatchArmed
+            if (!config.isStopwatchForceEnabled) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    repository.saveSecretConfig(config.copy(isStopwatchForceEnabled = true))
+                }
+            }
+        }
+
+        if (stateChanged) {
+            if (isArmedNow) {
                 // Subtle crisp double haptic pulse indicating force armed
                 performHaptic(pattern = longArrayOf(0, 45, 60, 45))
             } else {
@@ -444,15 +475,35 @@ class ClockViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun onVolumeButtonTriggered() {
         val config = secretConfig.value ?: SecretConfigEntity()
-        if (config.alarmForceTriggerType == "VOLUME_BUTTON") {
-            val newState = !_isAlarmForceArmed.value
-            _isAlarmForceArmed.value = newState
+        var stateChanged = false
+        var isArmedNow = false
+
+        if (config.alarmForceTriggerType in listOf("VOLUME_BUTTON", "WAVE_OR_VOLUME")) {
+            val newAlarmArmed = !_isAlarmForceArmed.value
+            _isAlarmForceArmed.value = newAlarmArmed
+            stateChanged = true
+            isArmedNow = newAlarmArmed
             if (!config.isForceEnabled) {
                 viewModelScope.launch(Dispatchers.IO) {
                     repository.saveSecretConfig(config.copy(isForceEnabled = true))
                 }
             }
-            if (newState) {
+        }
+
+        if (config.stopwatchForceTriggerType in listOf("VOLUME_BUTTON", "WAVE_OR_VOLUME")) {
+            val newStopwatchArmed = !_isStopwatchForceArmed.value
+            _isStopwatchForceArmed.value = newStopwatchArmed
+            stateChanged = true
+            isArmedNow = isArmedNow || newStopwatchArmed
+            if (!config.isStopwatchForceEnabled) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    repository.saveSecretConfig(config.copy(isStopwatchForceEnabled = true))
+                }
+            }
+        }
+
+        if (stateChanged) {
+            if (isArmedNow) {
                 // Subtle crisp double haptic pulse indicating force armed
                 performHaptic(pattern = longArrayOf(0, 45, 60, 45))
             } else {
@@ -464,6 +515,10 @@ class ClockViewModel(application: Application) : AndroidViewModel(application) {
 
     fun resetAlarmForceArmed() {
         _isAlarmForceArmed.value = false
+    }
+
+    fun resetStopwatchForceArmed() {
+        _isStopwatchForceArmed.value = false
     }
 
     /**

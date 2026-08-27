@@ -41,6 +41,7 @@ data class SecretConfigEntity(
     val isStopwatchForceEnabled: Boolean = false,
     val forcedStopwatchCentiseconds: Int = 37, // 0-99 hundredths of a second (.00 to .99)
     val stopwatchForceTriggerStopCount: Int = 1, // 0 = Every Stop, 1 = 1st Stop, 2 = 2nd Stop, 3 = 3rd Stop, etc.
+    val stopwatchForceTriggerType: String = "ALWAYS", // ALWAYS, PROXIMITY_WAVE, VOLUME_BUTTON, WAVE_OR_VOLUME
     val forceMode: String = "MAGNETIC", // MAGNETIC, INSTANT, GRAVITY, DISCREET_TAP
     val secretPin: String = "1234",
     val isPinRequired: Boolean = false,

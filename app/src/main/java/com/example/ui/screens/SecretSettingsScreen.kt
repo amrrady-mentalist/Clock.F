@@ -116,6 +116,10 @@ fun SecretSettingsDialog(
         mutableIntStateOf(secretConfig?.stopwatchForceTriggerStopCount ?: 1)
     }
 
+    var stopwatchForceTriggerType by remember(secretConfig) {
+        mutableStateOf(secretConfig?.stopwatchForceTriggerType ?: "ALWAYS")
+    }
+
     var selectedAccentName by remember(secretConfig) {
         mutableStateOf(secretConfig?.accentColorTheme ?: AccentTheme.WHITE.name)
     }
@@ -612,6 +616,87 @@ fun SecretSettingsDialog(
                                 HorizontalDivider(color = DividerColor.copy(alpha = 0.5f))
                                 Spacer(modifier = Modifier.height(14.dp))
 
+                                // STOPWATCH HARDWARE & STEALTH FORCE TRIGGERS
+                                Text(
+                                    text = "STOPWATCH FORCE TRIGGER",
+                                    color = TextTertiary,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 1.2.sp
+                                )
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                val stopwatchTriggerOptions = listOf(
+                                    Triple("ALWAYS", "Always Active", "Continuous force on target stop count"),
+                                    Triple("VOLUME_BUTTON", "Volume Button", "Click Vol Up/Down to silently arm"),
+                                    Triple("PROXIMITY_WAVE", "Proximity Wave", "Wave hand over top sensor to arm"),
+                                    Triple("WAVE_OR_VOLUME", "Wave or Volume", "Arm via proximity wave or volume keys")
+                                )
+
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    stopwatchTriggerOptions.forEach { (typeKey, title, desc) ->
+                                        val isSelected = stopwatchForceTriggerType == typeKey
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(if (isSelected) AmberAccent.copy(alpha = 0.22f) else DarkSurfaceVariant)
+                                                .border(
+                                                    width = if (isSelected) 1.5.dp else 1.dp,
+                                                    color = if (isSelected) AmberAccent else Color(0x1AFFFFFF),
+                                                    shape = RoundedCornerShape(12.dp)
+                                                )
+                                                .clickable { stopwatchForceTriggerType = typeKey }
+                                                .padding(horizontal = 14.dp, vertical = 10.dp)
+                                                .testTag("stopwatch_trigger_${typeKey.lowercase()}"),
+                                            contentAlignment = Alignment.CenterStart
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Column(modifier = Modifier.weight(1f)) {
+                                                    Text(
+                                                        text = title,
+                                                        color = if (isSelected) AmberAccent else TextPrimary,
+                                                        fontSize = 13.sp,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                    Text(
+                                                        text = desc,
+                                                        color = if (isSelected) TextPrimary.copy(alpha = 0.9f) else TextSecondary,
+                                                        fontSize = 11.sp
+                                                    )
+                                                }
+                                                if (isSelected) {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .size(22.dp)
+                                                            .background(AmberAccent, CircleShape),
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Icon(
+                                                            imageVector = Icons.Default.Check,
+                                                            contentDescription = "Selected",
+                                                            tint = Color.Black,
+                                                            modifier = Modifier.size(14.dp)
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(18.dp))
+                                HorizontalDivider(color = DividerColor.copy(alpha = 0.5f))
+                                Spacer(modifier = Modifier.height(14.dp))
+
                                 // Trigger on Nth stop
                                 Text(
                                     text = "TRIGGER AFTER STOP COUNT",
@@ -642,10 +727,10 @@ fun SecretSettingsDialog(
                                             modifier = Modifier
                                                 .weight(1f)
                                                 .clip(RoundedCornerShape(10.dp))
-                                                .background(if (isSelected) Color.White.copy(alpha = 0.25f) else DarkSurfaceVariant)
+                                                .background(if (isSelected) AmberAccent.copy(alpha = 0.28f) else DarkSurfaceVariant)
                                                 .border(
                                                     width = if (isSelected) 1.5.dp else 0.dp,
-                                                    color = if (isSelected) Color.White else Color.Transparent,
+                                                    color = if (isSelected) AmberAccent else Color.Transparent,
                                                     shape = RoundedCornerShape(10.dp)
                                                 )
                                                 .clickable { stopwatchForceTriggerStopCount = count }
@@ -654,7 +739,7 @@ fun SecretSettingsDialog(
                                         ) {
                                             Text(
                                                 text = label,
-                                                color = if (isSelected) Color.White else TextPrimary,
+                                                color = if (isSelected) AmberAccent else TextPrimary,
                                                 fontSize = 12.sp,
                                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                                             )
@@ -674,10 +759,10 @@ fun SecretSettingsDialog(
                                             modifier = Modifier
                                                 .weight(1f)
                                                 .clip(RoundedCornerShape(10.dp))
-                                                .background(if (isSelected) Color.White.copy(alpha = 0.25f) else DarkSurfaceVariant)
+                                                .background(if (isSelected) AmberAccent.copy(alpha = 0.28f) else DarkSurfaceVariant)
                                                 .border(
                                                     width = if (isSelected) 1.5.dp else 0.dp,
-                                                    color = if (isSelected) Color.White else Color.Transparent,
+                                                    color = if (isSelected) AmberAccent else Color.Transparent,
                                                     shape = RoundedCornerShape(10.dp)
                                                 )
                                                 .clickable { stopwatchForceTriggerStopCount = count }
@@ -686,7 +771,7 @@ fun SecretSettingsDialog(
                                         ) {
                                             Text(
                                                 text = label,
-                                                color = if (isSelected) Color.White else TextPrimary,
+                                                color = if (isSelected) AmberAccent else TextPrimary,
                                                 fontSize = 12.sp,
                                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                                             )
@@ -696,13 +781,20 @@ fun SecretSettingsDialog(
 
                                 Spacer(modifier = Modifier.height(8.dp))
 
+                                val triggerMethodText = when (stopwatchForceTriggerType) {
+                                    "VOLUME_BUTTON" -> "Volume Button press"
+                                    "PROXIMITY_WAVE" -> "Proximity Sensor wave"
+                                    "WAVE_OR_VOLUME" -> "Wave or Volume Button"
+                                    else -> "Automatic"
+                                }
+
                                 val triggerExplanation = when (stopwatchForceTriggerStopCount) {
-                                    1 -> "Forces on the 1st stop (Immediate standard force)."
-                                    2 -> "Forces on the 2nd stop. The 1st stop runs 100% naturally so the spectator can test the stopwatch first!"
-                                    3 -> "Forces on the 3rd stop. Stops #1 and #2 run naturally without forcing."
-                                    4 -> "Forces on the 4th stop. Stops #1 through #3 run naturally."
-                                    5 -> "Forces on the 5th stop. Stops #1 through #4 run naturally."
-                                    else -> "Forces on every single pause/stop."
+                                    1 -> "Armed via $triggerMethodText -> Forces on the 1st stop at .${String.format(Locale.US, "%02d", forcedStopwatchCentiseconds)}s."
+                                    2 -> "Armed via $triggerMethodText -> Forces on the 2nd stop. The 1st stop runs naturally!"
+                                    3 -> "Armed via $triggerMethodText -> Forces on the 3rd stop. Stops #1 and #2 run naturally."
+                                    4 -> "Armed via $triggerMethodText -> Forces on the 4th stop. Stops #1 through #3 run naturally."
+                                    5 -> "Armed via $triggerMethodText -> Forces on the 5th stop. Stops #1 through #4 run naturally."
+                                    else -> "Armed via $triggerMethodText -> Forces on every single pause/stop."
                                 }
 
                                 Text(
@@ -815,6 +907,7 @@ fun SecretSettingsDialog(
                             isStopwatchForceEnabled = isStopwatchForceEnabled,
                             forcedStopwatchCentiseconds = forcedStopwatchCentiseconds,
                             stopwatchForceTriggerStopCount = stopwatchForceTriggerStopCount,
+                            stopwatchForceTriggerType = stopwatchForceTriggerType,
                             forceMode = "MAGNETIC",
                             accentColorTheme = selectedAccentName,
                             secretPin = pinCode,
