@@ -41,7 +41,8 @@ class ClockViewModel(application: Application) : AndroidViewModel(application) {
     // Database Flows
     val alarms: StateFlow<List<AlarmEntity>>
     val worldCities: StateFlow<List<WorldCityEntity>>
-    val secretConfig: StateFlow<SecretConfigEntity?>
+    private val _secretConfig = MutableStateFlow<SecretConfigEntity?>(SecretConfigEntity())
+    val secretConfig: StateFlow<SecretConfigEntity?> = _secretConfig.asStateFlow()
 
     // Current Time Flow (updates every 50ms for smooth analog sweep)
     private val _currentTime = MutableStateFlow(System.currentTimeMillis())
@@ -127,8 +128,13 @@ class ClockViewModel(application: Application) : AndroidViewModel(application) {
         worldCities = repository.allWorldCities
             .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-        secretConfig = repository.secretConfig
-            .stateIn(viewModelScope, SharingStarted.Eagerly, SecretConfigEntity())
+        viewModelScope.launch {
+            repository.secretConfig.collect { config ->
+                if (config != null) {
+                    _secretConfig.value = config
+                }
+            }
+        }
 
         // Start clock ticker
         viewModelScope.launch(Dispatchers.Default) {
@@ -260,21 +266,34 @@ class ClockViewModel(application: Application) : AndroidViewModel(application) {
         stopwatchStopCount++
         _currentStopwatchStopCount.value = stopwatchStopCount
         val currentMs = _stopwatchTimeMs.value
-        val config = secretConfig.value
+        val config = secretConfig.value ?: SecretConfigEntity()
 
-        val isArmed = isStopwatchForceEffectivelyActive()
-        val targetTriggerStop = config?.stopwatchForceTriggerStopCount ?: 1
-        // targetTriggerStop == 0 means Every Stop, otherwise trigger exactly on the Nth stop
-        val shouldForce = isArmed && (targetTriggerStop == 0 || stopwatchStopCount == targetTriggerStop)
+        val triggerType = config.stopwatchForceTriggerType
+        val isHardwareTrigger = triggerType in listOf("PROXIMITY_WAVE", "VOLUME_BUTTON", "WAVE_OR_VOLUME")
+
+        val shouldForce = if (isHardwareTrigger) {
+            // Standalone hardware/gesture trigger: forces immediately on the next stop when armed, independent of stop count
+            _isStopwatchForceArmed.value
+        } else {
+            // ALWAYS mode: forces if enabled and matches stop count target (0 = Every Stop)
+            val isEnabled = config.isStopwatchForceEnabled
+            val targetTriggerStop = config.stopwatchForceTriggerStopCount
+            isEnabled && (targetTriggerStop == 0 || stopwatchStopCount == targetTriggerStop)
+        }
 
         if (shouldForce) {
-            val forcedCentis = config?.forcedStopwatchCentiseconds?.coerceIn(0, 99) ?: 37
+            val forcedCentis = config.forcedStopwatchCentiseconds.coerceIn(0, 99)
             val fullSeconds = currentMs / 1000
             // Seamlessly lock the 1/100s to the forced target
             val forcedMs = (fullSeconds * 1000) + (forcedCentis * 10)
             _stopwatchTimeMs.value = forcedMs
             stopwatchAccumulated = forcedMs
             performHaptic(pattern = longArrayOf(0, 40))
+
+            // Disarm after forcing the stop so subsequent stops are natural until re-armed
+            if (isHardwareTrigger) {
+                _isStopwatchForceArmed.value = false
+            }
         } else {
             stopwatchAccumulated = currentMs
         }
@@ -406,6 +425,7 @@ class ClockViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateSecretConfig(updated: SecretConfigEntity) {
+        _secretConfig.value = updated
         viewModelScope.launch(Dispatchers.IO) {
             repository.saveSecretConfig(updated)
         }

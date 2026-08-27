@@ -3,19 +3,14 @@ package com.example
 import android.app.Application
 import android.view.KeyEvent
 import androidx.test.core.app.ApplicationProvider
+import com.example.data.local.AppDatabase
 import com.example.data.local.SecretConfigEntity
 import com.example.ui.viewmodel.ClockViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.withTimeout
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -26,43 +21,19 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [36])
 class StopwatchVolumeForceTest {
 
-    private val testDispatcher = StandardTestDispatcher()
     private lateinit var application: Application
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(testDispatcher)
         application = ApplicationProvider.getApplicationContext()
     }
 
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
-    private suspend fun setupConfig(viewModel: ClockViewModel, config: SecretConfigEntity) {
-        viewModel.updateSecretConfig(config)
-        // Wait until Room flow emits the updated config
-        withTimeout(2000) {
-            viewModel.secretConfig.first {
-                it?.isStopwatchForceEnabled == config.isStopwatchForceEnabled &&
-                    it?.forcedStopwatchCentiseconds == config.forcedStopwatchCentiseconds &&
-                    it?.stopwatchForceTriggerType == config.stopwatchForceTriggerType &&
-                    it?.stopwatchForceTriggerStopCount == config.stopwatchForceTriggerStopCount
-            }
-        }
-    }
-
     @Test
-    fun `test volume button trigger arms stopwatch force and overrides displayed centiseconds`() = runTest(testDispatcher) {
-        val viewModel = ClockViewModel(application)
-        advanceUntilIdle()
-
+    fun `test volume button trigger arms force for next stop and automatically disarms after force`() {
         val forcedCentiseconds = 42
         val testConfig = SecretConfigEntity(
             isStopwatchForceEnabled = true,
@@ -70,78 +41,88 @@ class StopwatchVolumeForceTest {
             stopwatchForceTriggerStopCount = 1,
             stopwatchForceTriggerType = "VOLUME_BUTTON"
         )
-        setupConfig(viewModel, testConfig)
 
-        // 1. Initially, before volume key trigger, force is not armed
+        val controller = Robolectric.buildActivity(MainActivity::class.java).setup()
+        val activity = controller.get()
+        val viewModel = activity.viewModel
+        viewModel.updateSecretConfig(testConfig)
+
+        // 1. Initially un-armed
         assertFalse("Stopwatch force should not be armed initially", viewModel.isStopwatchForceArmed.value)
-        assertFalse("Effective force should be inactive", viewModel.isStopwatchForceEffectivelyActive())
 
-        // 2. Trigger Volume Button event (e.g. user clicked volume rocker)
+        // 2. Perform 2 random spectator test stops (unforced)
+        viewModel.startStopwatch()
+        viewModel.pauseStopwatch()
+        assertEquals(1, viewModel.currentStopwatchStopCount.value)
+
+        viewModel.startStopwatch()
+        viewModel.pauseStopwatch()
+        assertEquals(2, viewModel.currentStopwatchStopCount.value)
+
+        // 3. Magician clicks volume button to arm force on demand
         viewModel.onVolumeButtonTriggered()
-        advanceUntilIdle()
-
-        assertTrue("Stopwatch force should now be armed after volume event", viewModel.isStopwatchForceArmed.value)
+        assertTrue("Stopwatch force should now be armed", viewModel.isStopwatchForceArmed.value)
         assertTrue("Effective force should be active", viewModel.isStopwatchForceEffectivelyActive())
 
-        // 3. Start stopwatch, simulate elapsed time, and pause/stop
+        // 4. Next stop should apply forced hundredths (.42)
         viewModel.startStopwatch()
-        // Simulate running time to 4.89 seconds (4890ms)
-        Thread.sleep(50)
         viewModel.pauseStopwatch()
-        advanceUntilIdle()
 
-        // 4. Verify that the hundredths of a second were overridden to 42
-        val stoppedTimeMs = viewModel.stopwatchTimeMs.value
-        val actualCentiseconds = ((stoppedTimeMs % 1000L) / 10L).toInt()
-        assertEquals("Displayed centiseconds must match forced centiseconds value (42)", forcedCentiseconds, actualCentiseconds)
+        val forcedMs = viewModel.stopwatchTimeMs.value
+        val actualCentis = ((forcedMs % 1000L) / 10L).toInt()
+        assertEquals("Displayed centiseconds must match forced value (42)", forcedCentiseconds, actualCentis)
+
+        // 5. Force should automatically disarm after successful stop
+        assertFalse("Force should automatically disarm after being executed", viewModel.isStopwatchForceArmed.value)
+
+        controller.destroy()
     }
 
     @Test
-    fun `test volume button trigger with 2nd stop count allows 1st stop natural and forces 2nd stop`() = runTest(testDispatcher) {
-        val viewModel = ClockViewModel(application)
-        advanceUntilIdle()
-
+    fun `test wave and volume synced toggle allows random stops and disarming on demand`() {
         val forcedCentiseconds = 88
         val testConfig = SecretConfigEntity(
             isStopwatchForceEnabled = true,
             forcedStopwatchCentiseconds = forcedCentiseconds,
-            stopwatchForceTriggerStopCount = 2, // Force on 2nd stop
-            stopwatchForceTriggerType = "VOLUME_BUTTON"
+            stopwatchForceTriggerStopCount = 1,
+            stopwatchForceTriggerType = "WAVE_OR_VOLUME"
         )
-        setupConfig(viewModel, testConfig)
 
-        // Arm via volume button
-        viewModel.onVolumeButtonTriggered()
-        advanceUntilIdle()
-        assertTrue("Stopwatch force should be armed", viewModel.isStopwatchForceArmed.value)
-
-        // --- 1st Stop (Natural / Unforced test run) ---
-        viewModel.startStopwatch()
-        Thread.sleep(30)
-        viewModel.pauseStopwatch()
-        advanceUntilIdle()
-
-        assertEquals("Stop count should be 1 after first pause", 1, viewModel.currentStopwatchStopCount.value)
-
-        // --- 2nd Stop (Forced target) ---
-        viewModel.startStopwatch()
-        Thread.sleep(30)
-        viewModel.pauseStopwatch()
-        advanceUntilIdle()
-
-        assertEquals("Stop count should be 2 after second pause", 2, viewModel.currentStopwatchStopCount.value)
-        val secondStopMs = viewModel.stopwatchTimeMs.value
-        val secondCentis = ((secondStopMs % 1000L) / 10L).toInt()
-        assertEquals("Second stop centiseconds must be overridden to forced 88", forcedCentiseconds, secondCentis)
-    }
-
-    @Test
-    fun `test MainActivity volume key event intercept triggers stopwatch arming and overrides time`() = runTest(testDispatcher) {
         val controller = Robolectric.buildActivity(MainActivity::class.java).setup()
         val activity = controller.get()
         val viewModel = activity.viewModel
-        advanceUntilIdle()
+        viewModel.updateSecretConfig(testConfig)
 
+        // Wave over sensor to arm
+        viewModel.onProximityWaveDetected()
+        assertTrue("Stopwatch force should be armed after wave", viewModel.isStopwatchForceArmed.value)
+
+        // Spectator wants another test -> Click volume button to disarm
+        viewModel.onVolumeButtonTriggered()
+        assertFalse("Stopwatch force should be disarmed after volume click", viewModel.isStopwatchForceArmed.value)
+
+        // Spectator does unforced test stop
+        viewModel.startStopwatch()
+        viewModel.pauseStopwatch()
+
+        // Magician waves again to re-arm
+        viewModel.onProximityWaveDetected()
+        assertTrue("Stopwatch force should be re-armed after wave", viewModel.isStopwatchForceArmed.value)
+
+        // Stop is now forced!
+        viewModel.startStopwatch()
+        viewModel.pauseStopwatch()
+
+        val stoppedMs = viewModel.stopwatchTimeMs.value
+        val centis = ((stoppedMs % 1000L) / 10L).toInt()
+        assertEquals("Stop centiseconds must be forced 88", forcedCentiseconds, centis)
+        assertFalse("Stopwatch force should disarm after firing", viewModel.isStopwatchForceArmed.value)
+
+        controller.destroy()
+    }
+
+    @Test
+    fun `test MainActivity volume key event intercept triggers stopwatch arming`() {
         val forcedCentiseconds = 77
         val testConfig = SecretConfigEntity(
             isStopwatchForceEnabled = true,
@@ -149,23 +130,24 @@ class StopwatchVolumeForceTest {
             stopwatchForceTriggerStopCount = 1,
             stopwatchForceTriggerType = "VOLUME_BUTTON"
         )
-        setupConfig(viewModel, testConfig)
+
+        val controller = Robolectric.buildActivity(MainActivity::class.java).setup()
+        val activity = controller.get()
+        val viewModel = activity.viewModel
+        viewModel.updateSecretConfig(testConfig)
 
         assertFalse("Force should not be armed initially", viewModel.isStopwatchForceArmed.value)
 
-        // Dispatch Volume Down key event to the Activity
+        // Dispatch Volume Down key event to Activity
         val volumeDownEvent = KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_VOLUME_DOWN)
         val handled = activity.dispatchKeyEvent(volumeDownEvent)
-        advanceUntilIdle()
 
         assertTrue("Activity should intercept volume event when configured", handled)
         assertTrue("Stopwatch force should be armed via activity key event", viewModel.isStopwatchForceArmed.value)
 
         // Start and pause stopwatch, verify forced centiseconds
         viewModel.startStopwatch()
-        Thread.sleep(40)
         viewModel.pauseStopwatch()
-        advanceUntilIdle()
 
         val actualCentiseconds = ((viewModel.stopwatchTimeMs.value % 1000L) / 10L).toInt()
         assertEquals("Displayed centiseconds must match forced value 77", forcedCentiseconds, actualCentiseconds)

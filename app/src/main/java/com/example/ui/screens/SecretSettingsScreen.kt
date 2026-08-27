@@ -405,8 +405,9 @@ fun SecretSettingsDialog(
 
                             val triggerOptions = listOf(
                                 Triple("ALWAYS", "Always Active", "Continuous force on all scrolls"),
-                                Triple("PROXIMITY_WAVE", "Proximity Wave", "Wave hand over top sensor to arm"),
-                                Triple("VOLUME_BUTTON", "Volume Button", "Click Vol Up/Down to silently arm")
+                                Triple("VOLUME_BUTTON", "Volume Button", "Click Vol Up/Down to silently arm/disarm"),
+                                Triple("PROXIMITY_WAVE", "Proximity Wave", "Wave hand over top sensor to arm/disarm"),
+                                Triple("WAVE_OR_VOLUME", "Wave or Volume", "Synced: wave or volume clicks toggle armed/disarmed")
                             )
 
                             Column(
@@ -629,9 +630,9 @@ fun SecretSettingsDialog(
 
                                 val stopwatchTriggerOptions = listOf(
                                     Triple("ALWAYS", "Always Active", "Continuous force on target stop count"),
-                                    Triple("VOLUME_BUTTON", "Volume Button", "Click Vol Up/Down to silently arm"),
-                                    Triple("PROXIMITY_WAVE", "Proximity Wave", "Wave hand over top sensor to arm"),
-                                    Triple("WAVE_OR_VOLUME", "Wave or Volume", "Arm via proximity wave or volume keys")
+                                    Triple("VOLUME_BUTTON", "Volume Button", "Silently arm/disarm force on demand for the next stop"),
+                                    Triple("PROXIMITY_WAVE", "Proximity Wave", "Silently arm/disarm force on demand for the next stop"),
+                                    Triple("WAVE_OR_VOLUME", "Wave or Volume", "Synced: wave or volume clicks toggle armed/disarmed freely")
                                 )
 
                                 Column(
@@ -699,11 +700,17 @@ fun SecretSettingsDialog(
 
                                 // Trigger on Nth stop
                                 Text(
-                                    text = "TRIGGER AFTER STOP COUNT",
+                                    text = "ALWAYS MODE: TRIGGER STOP COUNT",
                                     color = TextTertiary,
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     letterSpacing = 1.2.sp
+                                )
+                                Text(
+                                    text = if (stopwatchForceTriggerType == "ALWAYS") "Select which stop number will apply the forced hundredths" else "Hardware triggers force on the next stop when armed (independent of count)",
+                                    color = TextSecondary,
+                                    fontSize = 11.sp,
+                                    modifier = Modifier.padding(top = 2.dp)
                                 )
 
                                 Spacer(modifier = Modifier.height(8.dp))

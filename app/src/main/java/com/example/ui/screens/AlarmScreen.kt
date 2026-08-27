@@ -526,10 +526,9 @@ fun AlarmEditorDialog(
 
     // Force engine parameters
     val isForceActive = remember(secretConfig?.isForceEnabled, secretConfig?.alarmForceTriggerType, isAlarmForceArmed) {
-        if (secretConfig?.isForceEnabled != true) false
-        else when (secretConfig.alarmForceTriggerType) {
-            "PROXIMITY_WAVE", "VOLUME_BUTTON" -> isAlarmForceArmed
-            else -> true // "ALWAYS"
+        when (secretConfig?.alarmForceTriggerType) {
+            "PROXIMITY_WAVE", "VOLUME_BUTTON", "WAVE_OR_VOLUME" -> isAlarmForceArmed
+            else -> secretConfig?.isForceEnabled == true
         }
     }
     val forcedHourTarget = remember(secretConfig) {
@@ -555,7 +554,7 @@ fun AlarmEditorDialog(
                 if (keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_VOLUME_UP ||
                     keyEvent.nativeKeyEvent.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
                 ) {
-                    if (secretConfig?.alarmForceTriggerType == "VOLUME_BUTTON") {
+                    if (secretConfig?.alarmForceTriggerType in listOf("VOLUME_BUTTON", "WAVE_OR_VOLUME")) {
                         if (keyEvent.nativeKeyEvent.action == KeyEvent.ACTION_DOWN && keyEvent.nativeKeyEvent.repeatCount == 0) {
                             onVolumeButtonTriggered()
                         }
