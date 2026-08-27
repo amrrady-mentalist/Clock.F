@@ -581,38 +581,6 @@ fun SecretSettingsDialog(
                                     fontWeight = FontWeight.Bold
                                 )
 
-                                Spacer(modifier = Modifier.height(10.dp))
-
-                                // Quick presets for common prediction numbers
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)
-                                ) {
-                                    listOf(0, 14, 27, 37, 42, 50, 73, 88).forEach { preset ->
-                                        val isSelected = forcedStopwatchCentiseconds == preset
-                                        Box(
-                                            modifier = Modifier
-                                                .clip(RoundedCornerShape(8.dp))
-                                                .background(if (isSelected) Color.White.copy(alpha = 0.25f) else DarkSurfaceVariant)
-                                                .border(
-                                                    width = 1.dp,
-                                                    color = if (isSelected) Color.White else Color.Transparent,
-                                                    shape = RoundedCornerShape(8.dp)
-                                                )
-                                                .clickable { forcedStopwatchCentiseconds = preset }
-                                                .padding(horizontal = 7.dp, vertical = 4.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Text(
-                                                text = ".${String.format(Locale.US, "%02d", preset)}",
-                                                color = if (isSelected) Color.White else TextSecondary,
-                                                fontSize = 11.sp,
-                                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                                            )
-                                        }
-                                    }
-                                }
-
                                 Spacer(modifier = Modifier.height(18.dp))
                                 HorizontalDivider(color = DividerColor.copy(alpha = 0.5f))
                                 Spacer(modifier = Modifier.height(14.dp))
